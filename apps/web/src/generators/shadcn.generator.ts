@@ -1,36 +1,169 @@
 import type { FrameworkGenerator, FormConfig, GeneratorOutput } from './types'
+import type { FormField } from '@/stores/builder.store'
+
+function getFormFieldComponent(field: FormField, showLabels: boolean, showValidation: boolean): string {
+  const required = showValidation && field.required
+  const requiredAttr = required ? '\n          required' : ''
+  const helperText = field.helperText ? `\n          description="${field.helperText}"` : ''
+
+  if (field.type === 'textarea') {
+    return `
+      <FormField
+        control={form.control}
+        name="${field.name}"
+        render={({ field }) => (
+          <FormItem>
+            ${showLabels ? `<FormLabel>${field.label ?? field.name}</FormLabel>` : ''}
+            <FormControl>
+              <Textarea
+                placeholder="${field.placeholder ?? ''}"${requiredAttr}
+                {...field}
+              />
+            </FormControl>${helperText ? `\n            <FormDescription>${field.helperText}</FormDescription>` : ''}
+            <FormMessage />
+          </FormItem>
+        )}
+      />`
+  }
+
+  if (field.type === 'select' || field.type === 'autocomplete') {
+    return `
+      <FormField
+        control={form.control}
+        name="${field.name}"
+        render={({ field }) => (
+          <FormItem>
+            ${showLabels ? `<FormLabel>${field.label ?? field.name}</FormLabel>` : ''}
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select ${field.label?.toLowerCase() ?? field.name}..." />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="option1">Option 1</SelectItem>
+                <SelectItem value="option2">Option 2</SelectItem>
+              </SelectContent>
+            </Select>${helperText ? `\n            <FormDescription>${field.helperText}</FormDescription>` : ''}
+            <FormMessage />
+          </FormItem>
+        )}
+      />`
+  }
+
+  if (field.type === 'checkbox') {
+    return `
+      <FormField
+        control={form.control}
+        name="${field.name}"
+        render={({ field }) => (
+          <FormItem className="flex items-center gap-2 space-y-0">
+            <FormControl>
+              <Checkbox
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            </FormControl>
+            ${showLabels ? `<FormLabel className="font-normal">${field.label ?? field.name}</FormLabel>` : ''}
+            <FormMessage />
+          </FormItem>
+        )}
+      />`
+  }
+
+  return `
+      <FormField
+        control={form.control}
+        name="${field.name}"
+        render={({ field }) => (
+          <FormItem>
+            ${showLabels ? `<FormLabel>${field.label ?? field.name}</FormLabel>` : ''}
+            <FormControl>
+              <Input
+                type="${field.type}"
+                placeholder="${field.placeholder ?? ''}"${requiredAttr}
+                {...field}
+              />
+            </FormControl>${helperText ? `\n            <FormDescription>${field.helperText}</FormDescription>` : ''}
+            <FormMessage />
+          </FormItem>
+        )}
+      />`
+}
 
 export const shadcnGenerator: FrameworkGenerator = {
   framework: 'shadcn',
 
   generateForm(config: FormConfig): GeneratorOutput {
-    const { title, fields, showSubmitButton, showLabels } = config
+    const { title, fields, showSubmitButton, showLabels, showValidation } = config
+    const componentName = title.replace(/\s+/g, '')
 
-    const imports = [
-      `import { Button } from "@/components/ui/button"`,
-      `import { Input } from "@/components/ui/input"`,
-      `import { Label } from "@/components/ui/label"`,
-    ]
+    const hasSelect = fields.some((f) => f.type === 'select' || f.type === 'autocomplete')
+    const hasCheckbox = fields.some((f) => f.type === 'checkbox')
+    const hasTextarea = fields.some((f) => f.type === 'textarea')
 
-    const fieldCode = fields
-      .map((field) => {
-        const label = showLabels ? `<Label htmlFor="${field.name}">${field.label}</Label>` : ''
-        const input = `<Input id="${field.name}" name="${field.name}" type="${field.type}" placeholder="${field.placeholder ?? ''}" />`
-        return `      <div className="flex flex-col gap-1.5">\n        ${label}\n        ${input}\n      </div>`
+    const zodFields = fields
+      .map((f) => {
+        if (f.type === 'email') return `  ${f.name}: z.string().email("Invalid email address"),`
+        if (f.type === 'number') return `  ${f.name}: z.coerce.number(),`
+        if (f.type === 'checkbox') return `  ${f.name}: z.boolean().default(false),`
+        if (showValidation && f.required) return `  ${f.name}: z.string().min(1, "${f.label} is required"),`
+        return `  ${f.name}: z.string(),`
       })
       .join('\n')
 
-    const submitBtn = showSubmitButton ? `      <Button type="submit">Submit</Button>` : ''
+    const defaultValues = fields
+      .map((f) => {
+        if (f.type === 'checkbox') return `    ${f.name}: false,`
+        if (f.type === 'number') return `    ${f.name}: 0,`
+        return `    ${f.name}: "",`
+      })
+      .join('\n')
+
+    const fieldComponents = fields
+      .map((f) => getFormFieldComponent(f, showLabels, showValidation))
+      .join('\n')
+
+    const imports = [
+      `import { useForm } from "react-hook-form"`,
+      `import { zodResolver } from "@hookform/resolvers/zod"`,
+      `import { z } from "zod"`,
+      `import { Button } from "@/components/ui/button"`,
+      `import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"`,
+      `import { Input } from "@/components/ui/input"`,
+      ...(hasTextarea ? [`import { Textarea } from "@/components/ui/textarea"`] : []),
+      ...(hasSelect ? [`import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"`] : []),
+      ...(hasCheckbox ? [`import { Checkbox } from "@/components/ui/checkbox"`] : []),
+    ]
 
     const code = `${imports.join('\n')}
 
-export function ${title.replace(/\s+/g, '')}Form() {
+const formSchema = z.object({
+${zodFields}
+})
+
+type ${componentName}Values = z.infer<typeof formSchema>
+
+export function ${componentName}Form() {
+  const form = useForm<${componentName}Values>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+${defaultValues}
+    },
+  })
+
+  function onSubmit(values: ${componentName}Values) {
+    console.log(values)
+  }
+
   return (
-    <form className="flex flex-col gap-4">
-      <h2 className="text-lg font-semibold">${title}</h2>
-${fieldCode}
-${submitBtn}
-    </form>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <h2 className="text-lg font-semibold">${title}</h2>
+${fieldComponents}
+        ${showSubmitButton ? `<Button type="submit">Submit</Button>` : ''}
+      </form>
+    </Form>
   )
 }`
 
