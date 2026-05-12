@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { useBuilderStore } from '@/stores/builder.store'
-import { generateForm, generateTable } from '@/generators'
+import { generateForm, generateTable, generateCard } from '@/generators'
 
 const CODE_TABS = [
   { id: 'component', label: 'Component' },
@@ -10,35 +10,18 @@ const CODE_TABS = [
 ]
 
 export function CodePanel() {
-  const {
-    framework,
-    componentType,
-    formTitle,
-    fields,
-    showSubmitButton,
-    showLabels,
-    showValidation,
-    tableConfig,
-  } = useBuilderStore()
-
+  const { framework, componentType, formTitle, fields, showSubmitButton, showLabels, showValidation, tableConfig, cardConfig } = useBuilderStore()
   const [activeTab, setActiveTab] = useState('component')
   const [copied, setCopied] = useState(false)
 
   const output =
     componentType === 'table'
       ? generateTable(framework, tableConfig)
-      : generateForm(framework, {
-          title: formTitle,
-          fields,
-          showSubmitButton,
-          showLabels,
-          showValidation,
-        })
+      : componentType === 'card'
+        ? generateCard(framework, cardConfig)
+        : generateForm(framework, { title: formTitle, fields, showSubmitButton, showLabels, showValidation })
 
-  const displayCode =
-    activeTab === 'imports' && output.imports
-      ? output.imports.join('\n')
-      : output.code
+  const displayCode = activeTab === 'imports' && output.imports ? output.imports.join('\n') : output.code
 
   async function handleCopy() {
     await navigator.clipboard.writeText(displayCode)
@@ -56,9 +39,7 @@ export function CodePanel() {
               onClick={() => setActiveTab(tab.id)}
               className={cn(
                 'border-b-2 px-3 py-2 text-xs font-medium transition-colors',
-                activeTab === tab.id
-                  ? 'border-brand-600 text-brand-600'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-700'
+                activeTab === tab.id ? 'border-brand-600 text-brand-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'
               )}
             >
               {tab.label}
@@ -73,11 +54,8 @@ export function CodePanel() {
           {copied ? 'Copied!' : 'Copy'}
         </button>
       </div>
-
       <div className="flex-1 overflow-auto">
-        <pre className="h-full p-3 text-xs leading-relaxed text-neutral-700">
-          <code>{displayCode}</code>
-        </pre>
+        <pre className="h-full p-3 text-xs leading-relaxed text-neutral-700"><code>{displayCode}</code></pre>
       </div>
     </div>
   )
