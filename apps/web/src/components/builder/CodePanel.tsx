@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { useBuilderStore } from '@/stores/builder.store'
-import { generateForm } from '@/generators'
+import { generateForm, generateTable } from '@/generators'
 
 const CODE_TABS = [
   { id: 'component', label: 'Component' },
@@ -10,18 +10,30 @@ const CODE_TABS = [
 ]
 
 export function CodePanel() {
-  const { framework, formTitle, fields, showSubmitButton, showLabels, showValidation } =
-    useBuilderStore()
-  const [activeTab, setActiveTab] = useState('component')
-  const [copied, setCopied] = useState(false)
-
-  const output = generateForm(framework, {
-    title: formTitle,
+  const {
+    framework,
+    componentType,
+    formTitle,
     fields,
     showSubmitButton,
     showLabels,
     showValidation,
-  })
+    tableConfig,
+  } = useBuilderStore()
+
+  const [activeTab, setActiveTab] = useState('component')
+  const [copied, setCopied] = useState(false)
+
+  const output =
+    componentType === 'table'
+      ? generateTable(framework, tableConfig)
+      : generateForm(framework, {
+          title: formTitle,
+          fields,
+          showSubmitButton,
+          showLabels,
+          showValidation,
+        })
 
   const displayCode =
     activeTab === 'imports' && output.imports

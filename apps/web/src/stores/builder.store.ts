@@ -27,16 +27,35 @@ export interface FormField {
   helperText?: string
 }
 
+export type ColumnType = 'text' | 'number' | 'date' | 'badge' | 'email' | 'actions'
+
+export interface TableColumn {
+  id: string
+  name: string
+  label: string
+  type: ColumnType
+  sortable: boolean
+}
+
+export interface TableConfig {
+  title: string
+  columns: TableColumn[]
+  showSearch: boolean
+  showPagination: boolean
+  rowsPerPage: number
+  showRowNumbers: boolean
+  striped: boolean
+  showActions: boolean
+}
+
 export interface BuilderState {
-  // Selected framework
   framework: Framework
   setFramework: (framework: Framework) => void
 
-  // Selected component
   componentType: ComponentType
   setComponentType: (type: ComponentType) => void
 
-  // Form config
+  // Form
   formTitle: string
   setFormTitle: (title: string) => void
   fields: FormField[]
@@ -44,14 +63,23 @@ export interface BuilderState {
   removeField: (id: string) => void
   updateField: (id: string, updates: Partial<FormField>) => void
   reorderFields: (from: number, to: number) => void
-
-  // Form options
   showSubmitButton: boolean
   setShowSubmitButton: (show: boolean) => void
   showLabels: boolean
   setShowLabels: (show: boolean) => void
   showValidation: boolean
   setShowValidation: (show: boolean) => void
+
+  // Table
+  tableConfig: TableConfig
+  setTableTitle: (title: string) => void
+  addColumn: (column: Omit<TableColumn, 'id'>) => void
+  removeColumn: (id: string) => void
+  updateColumn: (id: string, updates: Partial<TableColumn>) => void
+  setTableOption: <K extends keyof Omit<TableConfig, 'title' | 'columns'>>(
+    key: K,
+    value: TableConfig[K]
+  ) => void
 }
 
 export const useBuilderStore = create<BuilderState>()(
@@ -97,12 +125,60 @@ export const useBuilderStore = create<BuilderState>()(
 
       showSubmitButton: true,
       setShowSubmitButton: (showSubmitButton) => set({ showSubmitButton }),
-
       showLabels: true,
       setShowLabels: (showLabels) => set({ showLabels }),
-
       showValidation: false,
       setShowValidation: (showValidation) => set({ showValidation }),
+
+      tableConfig: {
+        title: 'Users',
+        columns: [
+          { id: '1', name: 'name', label: 'Name', type: 'text', sortable: true },
+          { id: '2', name: 'email', label: 'Email', type: 'email', sortable: true },
+          { id: '3', name: 'role', label: 'Role', type: 'badge', sortable: false },
+          { id: '4', name: 'created_at', label: 'Created', type: 'date', sortable: true },
+        ],
+        showSearch: true,
+        showPagination: true,
+        rowsPerPage: 10,
+        showRowNumbers: false,
+        striped: true,
+        showActions: true,
+      },
+
+      setTableTitle: (title) =>
+        set((state) => ({ tableConfig: { ...state.tableConfig, title } })),
+
+      addColumn: (column) =>
+        set((state) => ({
+          tableConfig: {
+            ...state.tableConfig,
+            columns: [...state.tableConfig.columns, { ...column, id: crypto.randomUUID() }],
+          },
+        })),
+
+      removeColumn: (id) =>
+        set((state) => ({
+          tableConfig: {
+            ...state.tableConfig,
+            columns: state.tableConfig.columns.filter((c) => c.id !== id),
+          },
+        })),
+
+      updateColumn: (id, updates) =>
+        set((state) => ({
+          tableConfig: {
+            ...state.tableConfig,
+            columns: state.tableConfig.columns.map((c) =>
+              c.id === id ? { ...c, ...updates } : c
+            ),
+          },
+        })),
+
+      setTableOption: (key, value) =>
+        set((state) => ({
+          tableConfig: { ...state.tableConfig, [key]: value },
+        })),
     }),
     { name: 'builder-store' }
   )
