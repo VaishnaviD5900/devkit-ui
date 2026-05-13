@@ -97,7 +97,7 @@ export interface NavbarConfig {
 }
 
 // --- Modal ---
-export type ModalType = 'default' | 'confirmation' | 'form' | 'alert'
+export type ModalType = 'default' | 'confirmation' | 'custom' | 'alert'
 export type ModalSize = 'sm' | 'md' | 'lg' | 'full'
 export type ModalAlertVariant = 'info' | 'success' | 'warning' | 'danger'
 

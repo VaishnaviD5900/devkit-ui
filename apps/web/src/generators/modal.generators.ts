@@ -43,7 +43,6 @@ export function generateShadcnModal(config: ModalConfig): GeneratorOutput {
     `import { useState } from "react"`,
     `import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"`,
     `import { Button } from "@/components/ui/button"`,
-    ...(modalType === 'form' ? [`import { Input } from "@/components/ui/input"`, `import { Label } from "@/components/ui/label"`] : []),
     ...(modalType === 'alert' && showIcon ? [`import { ${iconName} } from "lucide-react"`] : []),
   ]
 
@@ -55,17 +54,9 @@ export function generateShadcnModal(config: ModalConfig): GeneratorOutput {
 
   let bodyCode = ''
 
-  if (modalType === 'form') {
-    bodyCode = `      <div className="grid gap-4 py-4">
-        <div className="grid gap-2">
-          <Label htmlFor="name">Full name</Label>
-          <Input id="name" placeholder="John Doe" />
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="you@example.com" />
-        </div>
-      </div>`
+  if (modalType === 'custom') {
+    bodyCode = `      {/* Slot your own content here */}
+      {children}`
   } else if (modalType === 'alert') {
     bodyCode = showIcon
       ? `      <div className="flex items-start gap-3 py-2">
@@ -77,26 +68,40 @@ export function generateShadcnModal(config: ModalConfig): GeneratorOutput {
     bodyCode = `      <DialogDescription className="py-2">${description}</DialogDescription>`
   }
 
+  const isCustom = modalType === 'custom'
+
   const code = `${imports.join('\n')}
 
-export function ${title.replace(/\s+/g, '')}Modal() {
+${isCustom ? `interface ${title.replace(/\s+/g, '')}ModalProps {
+  children: React.ReactNode
+  trigger?: React.ReactNode
+}
+
+export function ${title.replace(/\s+/g, '')}Modal({ children, trigger }: ${title.replace(/\s+/g, '')}ModalProps) {` : `export function ${title.replace(/\s+/g, '')}Modal() {`}
   const [open, setOpen] = useState(false)
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Open ${title}</Button>
+        ${isCustom ? `{trigger ?? <Button variant="outline">Open ${title}</Button>}` : `<Button variant="outline">Open ${title}</Button>`}
       </DialogTrigger>
-      <DialogContent className="${sizeClass}"${!showCloseButton ? ' hideCloseButton' : ''}>
+      <DialogContent className="${sizeClass}">
         <DialogHeader>
           <DialogTitle>${title}</DialogTitle>
+          ${!isCustom ? `<DialogDescription>${description}</DialogDescription>` : ''}
         </DialogHeader>
 ${bodyCode}
 ${footerCode}
       </DialogContent>
     </Dialog>
   )
-}`
+}
+
+${isCustom ? `// Usage example:
+// <${title.replace(/\s+/g, '')}Modal trigger={<Button>Open</Button>}>
+//   <YourFormComponent />
+//   <YourTableComponent />
+// </${title.replace(/\s+/g, '')}Modal>` : ''}`
 
   return { code, language: 'tsx', imports }
 }
@@ -107,6 +112,7 @@ export function generateMuiModal(config: ModalConfig): GeneratorOutput {
   const { modalType, title, description, size, showCloseButton, showFooter, actions, alertVariant, showIcon } = config
 
   const maxWidth = SIZE_MAP.mui[size]
+  const isCustom = modalType === 'custom'
 
   const imports = [
     `import { useState } from "react"`,
@@ -118,16 +124,13 @@ export function generateMuiModal(config: ModalConfig): GeneratorOutput {
     `import Button from "@mui/material/Button"`,
     ...(showCloseButton ? [`import IconButton from "@mui/material/IconButton"`, `import CloseIcon from "@mui/icons-material/Close"`] : []),
     ...(modalType === 'alert' && showIcon ? [`import Alert from "@mui/material/Alert"`] : []),
-    ...(modalType === 'form' ? [`import TextField from "@mui/material/TextField"`, `import Box from "@mui/material/Box"`] : []),
   ]
 
   let bodyCode = ''
 
-  if (modalType === 'form') {
-    bodyCode = `        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
-          <TextField label="Full name" placeholder="John Doe" fullWidth />
-          <TextField label="Email" type="email" placeholder="you@example.com" fullWidth />
-        </Box>`
+  if (isCustom) {
+    bodyCode = `        {/* Slot your own content here */}
+        {children}`
   } else if (modalType === 'alert' && showIcon) {
     bodyCode = `        <Alert severity="${MUI_ALERT_SEVERITY[alertVariant]}">${description}</Alert>`
   } else {
@@ -142,15 +145,20 @@ export function generateMuiModal(config: ModalConfig): GeneratorOutput {
 
   const code = `${imports.join('\n')}
 
-export function ${title.replace(/\s+/g, '')}Modal() {
-  const [open, setOpen] = useState(false)
+${isCustom ? `interface ${title.replace(/\s+/g, '')}ModalProps {
+  children: React.ReactNode
+  triggerLabel?: string
+}
 
-  const handleOpen = () => setOpen(true)
+export function ${title.replace(/\s+/g, '')}Modal({ children, triggerLabel = "Open ${title}" }: ${title.replace(/\s+/g, '')}ModalProps) {` : `export function ${title.replace(/\s+/g, '')}Modal() {`}
+  const [open, setOpen] = useState(false)
   const handleClose = () => setOpen(false)
 
   return (
     <>
-      <Button variant="outlined" onClick={handleOpen}>Open ${title}</Button>
+      <Button variant="outlined" onClick={() => setOpen(true)}>
+        ${isCustom ? '{triggerLabel}' : `Open ${title}`}
+      </Button>
 
       <Dialog
         open={open}
@@ -169,7 +177,12 @@ ${footerCode}
       </Dialog>
     </>
   )
-}`
+}
+
+${isCustom ? `// Usage example:
+// <${title.replace(/\s+/g, '')}Modal>
+//   <YourFormComponent />
+// </${title.replace(/\s+/g, '')}Modal>` : ''}`
 
   return { code, language: 'tsx', imports }
 }
@@ -181,14 +194,13 @@ export function generateVuetifyModal(config: ModalConfig): GeneratorOutput {
 
   const widthMap = { sm: '400', md: '560', lg: '720', full: '100%' }
   const width = widthMap[size]
-
+  const isCustom = modalType === 'custom'
   const alertSeverity = MUI_ALERT_SEVERITY[alertVariant]
 
   let bodyCode = ''
-
-  if (modalType === 'form') {
-    bodyCode = `      <v-text-field label="Full name" placeholder="John Doe" variant="outlined" class="mb-3" />
-      <v-text-field label="Email" type="email" placeholder="you@example.com" variant="outlined" />`
+  if (isCustom) {
+    bodyCode = `      <!-- Default slot: put your own content here -->
+      <slot />`
   } else if (modalType === 'alert' && showIcon) {
     bodyCode = `      <v-alert type="${alertSeverity}" variant="tonal">${description}</v-alert>`
   } else {
@@ -204,7 +216,10 @@ export function generateVuetifyModal(config: ModalConfig): GeneratorOutput {
   const code = `<template>
   <v-dialog v-model="dialog" width="${width}"${size === 'full' ? ' fullscreen' : ''}>
     <template #activator="{ props }">
-      <v-btn v-bind="props" variant="outlined">Open ${title}</v-btn>
+      <!-- Named slot: override the trigger from outside -->
+      <slot name="activator" v-bind="{ props }">
+        <v-btn v-bind="props" variant="outlined">Open ${title}</v-btn>
+      </slot>
     </template>
 
     <v-card>
@@ -225,7 +240,17 @@ ${footerCode}
 <script setup lang="ts">
 import { ref } from "vue"
 const dialog = ref(false)
-</script>`
+</script>
+
+${isCustom ? `<!--
+Usage example:
+<${title.replace(/\s+/g, '')}Modal>
+  <template #activator="{ props }">
+    <v-btn v-bind="props">Open</v-btn>
+  </template>
+  <YourFormComponent />
+</${title.replace(/\s+/g, '')}Modal>
+-->` : ''}`
 
   return { code, language: 'vue', imports: [] }
 }
@@ -233,11 +258,12 @@ const dialog = ref(false)
 // ─── Angular Material ─────────────────────────────────────────────────────────
 
 export function generateAngularModal(config: ModalConfig): GeneratorOutput {
-  const { modalType, title, description, size, showFooter, actions, alertVariant, showIcon } = config
+  const { modalType, title, description, size, showCloseButton, showFooter, actions, alertVariant, showIcon } = config
 
   const widthMap = { sm: '400px', md: '560px', lg: '720px', full: '100vw' }
   const width = widthMap[size]
   const componentName = title.replace(/\s+/g, '')
+  const isCustom = modalType === 'custom'
   const alertSeverity = MUI_ALERT_SEVERITY[alertVariant]
 
   const imports = [
@@ -245,22 +271,12 @@ export function generateAngularModal(config: ModalConfig): GeneratorOutput {
     `import { MatDialogModule, MatDialogRef, MatDialog } from "@angular/material/dialog"`,
     `import { MatButtonModule } from "@angular/material/button"`,
     ...(showCloseButton ? [`import { MatIconModule } from "@angular/material/icon"`] : []),
-    ...(modalType === 'form' ? [`import { MatFormFieldModule } from "@angular/material/form-field"`, `import { MatInputModule } from "@angular/material/input"`] : []),
   ]
 
-  const showCloseButton = config.showCloseButton
-
   let bodyCode = ''
-  if (modalType === 'form') {
-    bodyCode = `
-        <mat-form-field appearance="outline" class="w-full mb-3">
-          <mat-label>Full name</mat-label>
-          <input matInput placeholder="John Doe" />
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Email</mat-label>
-          <input matInput type="email" placeholder="you@example.com" />
-        </mat-form-field>`
+  if (isCustom) {
+    bodyCode = `\n        <!-- ng-content projects any content passed into this component -->
+        <ng-content />`
   } else if (modalType === 'alert' && showIcon) {
     bodyCode = `\n        <p class="text-${alertSeverity === 'error' ? 'red' : alertSeverity}-600">${description}</p>`
   } else {
@@ -279,7 +295,7 @@ export function generateAngularModal(config: ModalConfig): GeneratorOutput {
 @Component({
   selector: "app-${title.toLowerCase().replace(/\s+/g, '-')}-dialog",
   standalone: true,
-  imports: [MatDialogModule, MatButtonModule${showCloseButton ? ', MatIconModule' : ''}${modalType === 'form' ? ', MatFormFieldModule, MatInputModule' : ''}],
+  imports: [MatDialogModule, MatButtonModule${showCloseButton ? ', MatIconModule' : ''}],
   template: \`
     <mat-dialog-content>
       <div class="flex items-center justify-between mb-4">
@@ -298,9 +314,7 @@ export class ${componentName}DialogComponent {}
   selector: "app-${title.toLowerCase().replace(/\s+/g, '-')}-trigger",
   standalone: true,
   imports: [MatButtonModule],
-  template: \`
-    <button mat-stroked-button (click)="openDialog()">Open ${title}</button>
-  \`,
+  template: \`<button mat-stroked-button (click)="openDialog()">Open ${title}</button>\`,
 })
 export class ${componentName}TriggerComponent {
   private dialog = inject(MatDialog)
@@ -310,7 +324,15 @@ export class ${componentName}TriggerComponent {
       width: "${width}",${size === 'full' ? '\n      maxWidth: "100vw",\n      height: "100vh",' : ''}
     })
   }
-}`
+}
+
+${isCustom ? `// Usage: to project content into the dialog, pass components
+// via MatDialog data injection or extend the dialog component directly.
+// Example using data:
+// this.dialog.open(${componentName}DialogComponent, {
+//   width: "${width}",
+//   data: { component: YourFormComponent }
+// })` : ''}`
 
   return { code, language: 'typescript', imports }
 }
@@ -322,6 +344,7 @@ export function generateTailwindModal(config: ModalConfig): GeneratorOutput {
 
   const sizeClass = SIZE_MAP.tailwind[size]
   const iconName = ALERT_ICON[alertVariant]
+  const isCustom = modalType === 'custom'
 
   const alertBgMap: Record<ModalAlertVariant, string> = {
     info: 'bg-blue-50 border-blue-200',
@@ -338,17 +361,9 @@ export function generateTailwindModal(config: ModalConfig): GeneratorOutput {
 
   let bodyCode = ''
 
-  if (modalType === 'form') {
-    bodyCode = `        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-gray-700">Full name</label>
-            <input type="text" placeholder="John Doe" className="h-9 w-full rounded-md border border-gray-300 px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-gray-700">Email</label>
-            <input type="email" placeholder="you@example.com" className="h-9 w-full rounded-md border border-gray-300 px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
-          </div>
-        </div>`
+  if (isCustom) {
+    bodyCode = `        {/* Slot your own content here */}
+        {children}`
   } else if (modalType === 'alert' && showIcon) {
     bodyCode = `        <div className="flex items-start gap-3 rounded-md border p-3 ${alertBgMap[alertVariant]}">
           <span className="${alertTextMap[alertVariant]}">⚠</span>
@@ -375,21 +390,37 @@ export function generateTailwindModal(config: ModalConfig): GeneratorOutput {
 
   const imports = [`import { useState } from "react"`]
 
+  const componentName = title.replace(/\s+/g, '')
+
   const code = `${imports.join('\n')}
 
-export function ${title.replace(/\s+/g, '')}Modal() {
-  const [open, setOpen] = useState(false)
+${isCustom ? `interface ${componentName}ModalProps {
+  children: React.ReactNode
+  trigger?: React.ReactNode
+}
 
+export function ${componentName}Modal({ children, trigger }: ${componentName}ModalProps) {` : `export function ${componentName}Modal() {`}
+  const [open, setOpen] = useState(false)
   const handleClose = () => setOpen(false)
 
   return (
     <>
-      <button
+      {/* Trigger */}
+      ${isCustom
+        ? `{trigger ?? (
+        <button
+          onClick={() => setOpen(true)}
+          className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          Open ${title}
+        </button>
+      )}`
+        : `<button
         onClick={() => setOpen(true)}
         className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
       >
         Open ${title}
-      </button>
+      </button>`}
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -424,7 +455,13 @@ ${footerCode}
       )}
     </>
   )
-}`
+}
+
+${isCustom ? `// Usage example:
+// <${componentName}Modal trigger={<button>Open</button>}>
+//   <YourFormComponent />
+//   <YourTableComponent />
+// </${componentName}Modal>` : ''}`
 
   return { code, language: 'tsx', imports }
 }

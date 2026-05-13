@@ -104,7 +104,7 @@ export function ModalPreview() {
               </div>
             )}
 
-            {/* Default / Confirmation / Form header */}
+            {/* Default / Confirmation / Custom header */}
             {modalType !== 'alert' && (
               <div className="flex items-start justify-between border-b border-neutral-100 px-5 py-4">
                 <div>
@@ -127,16 +127,19 @@ export function ModalPreview() {
             {/* Body */}
             {(modalType !== 'alert' || !showIcon) && (
               <div className="px-5 py-4">
-                {modalType === 'form' ? (
-                  <div className="flex flex-col gap-3">
-                    <p className="text-xs text-neutral-500">{description}</p>
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-medium text-neutral-600">Full name</label>
-                      <input readOnly placeholder="John Doe" className="h-8 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 text-sm text-neutral-400" />
+                {modalType === 'custom' ? (
+                  <div className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-neutral-200 bg-neutral-50 py-8 text-center">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-neutral-400"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
                     </div>
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-medium text-neutral-600">Email</label>
-                      <input readOnly placeholder="you@example.com" className="h-8 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 text-sm text-neutral-400" />
+                    <div>
+                      <p className="text-xs font-medium text-neutral-600">Your content slot</p>
+                      <p className="mt-0.5 text-[11px] text-neutral-400">
+                        Pass any component as <code className="rounded bg-neutral-100 px-1 font-mono">children</code>
+                      </p>
+                    </div>
+                    <div className="mt-1 rounded-md bg-neutral-100 px-3 py-1.5 font-mono text-[10px] text-neutral-500">
+                      {'<Modal><YourComponent /></Modal>'}
                     </div>
                   </div>
                 ) : modalType === 'confirmation' ? (

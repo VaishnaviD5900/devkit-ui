@@ -8,7 +8,7 @@ import { useBuilderStore, type ModalType, type ModalSize, type ModalAlertVariant
 const MODAL_TYPES: { value: ModalType; label: string; description: string }[] = [
   { value: 'default', label: 'Default', description: 'General purpose modal' },
   { value: 'confirmation', label: 'Confirmation', description: 'Confirm an action' },
-  { value: 'form', label: 'Form', description: 'Modal with a form' },
+  { value: 'custom', label: 'Custom', description: 'Slot your own content' },
   { value: 'alert', label: 'Alert', description: 'Status / info message' },
 ]
 
