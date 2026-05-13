@@ -2,20 +2,10 @@ import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
 export type Framework = 'shadcn' | 'mui' | 'vuetify' | 'angular-material' | 'tailwind'
-
-export type FieldType =
-  | 'text'
-  | 'email'
-  | 'password'
-  | 'number'
-  | 'textarea'
-  | 'select'
-  | 'autocomplete'
-  | 'checkbox'
-  | 'radio'
-  | 'date'
-
 export type ComponentType = 'form' | 'card' | 'table' | 'navbar' | 'modal' | 'alert'
+
+// --- Form ---
+export type FieldType = 'text' | 'email' | 'password' | 'number' | 'textarea' | 'select' | 'autocomplete' | 'checkbox' | 'radio' | 'date'
 
 export interface FormField {
   id: string
@@ -27,7 +17,7 @@ export interface FormField {
   helperText?: string
 }
 
-// --- Table types ---
+// --- Table ---
 export type ColumnType = 'text' | 'number' | 'date' | 'badge' | 'email' | 'actions'
 
 export interface TableColumn {
@@ -49,7 +39,7 @@ export interface TableConfig {
   showActions: boolean
 }
 
-// --- Card types ---
+// --- Card ---
 export type CardType = 'basic' | 'profile' | 'stats' | 'product'
 
 export interface CardAction {
@@ -83,10 +73,33 @@ export interface CardConfig {
   rounded: 'none' | 'sm' | 'md' | 'lg' | 'xl'
 }
 
+// --- Navbar ---
+export type NavbarVariant = 'default' | 'dark' | 'transparent'
+
+export interface NavLink {
+  id: string
+  label: string
+  href: string
+  active?: boolean
+}
+
+export interface NavbarConfig {
+  brand: string
+  showLogo: boolean
+  variant: NavbarVariant
+  links: NavLink[]
+  showAuthButtons: boolean
+  loginLabel: string
+  signupLabel: string
+  showSearch: boolean
+  sticky: boolean
+  showMobileMenu: boolean
+}
+
+// --- Store ---
 export interface BuilderState {
   framework: Framework
   setFramework: (framework: Framework) => void
-
   componentType: ComponentType
   setComponentType: (type: ComponentType) => void
 
@@ -111,10 +124,7 @@ export interface BuilderState {
   addColumn: (column: Omit<TableColumn, 'id'>) => void
   removeColumn: (id: string) => void
   updateColumn: (id: string, updates: Partial<TableColumn>) => void
-  setTableOption: <K extends keyof Omit<TableConfig, 'title' | 'columns'>>(
-    key: K,
-    value: TableConfig[K]
-  ) => void
+  setTableOption: <K extends keyof Omit<TableConfig, 'title' | 'columns'>>(key: K, value: TableConfig[K]) => void
 
   // Card
   cardConfig: CardConfig
@@ -123,6 +133,13 @@ export interface BuilderState {
   removeCardAction: (id: string) => void
   addStatItem: (stat: Omit<StatItem, 'id'>) => void
   removeStatItem: (id: string) => void
+
+  // Navbar
+  navbarConfig: NavbarConfig
+  setNavbarConfig: (updates: Partial<NavbarConfig>) => void
+  addNavLink: (link: Omit<NavLink, 'id'>) => void
+  removeNavLink: (id: string) => void
+  updateNavLink: (id: string, updates: Partial<NavLink>) => void
 }
 
 export const useBuilderStore = create<BuilderState>()(
@@ -130,7 +147,6 @@ export const useBuilderStore = create<BuilderState>()(
     (set) => ({
       framework: 'shadcn',
       setFramework: (framework) => set({ framework }),
-
       componentType: 'form',
       setComponentType: (componentType) => set({ componentType }),
 
@@ -142,19 +158,15 @@ export const useBuilderStore = create<BuilderState>()(
         { id: '2', name: 'email', type: 'email', label: 'Email', placeholder: 'you@example.com', required: true },
         { id: '3', name: 'country', type: 'autocomplete', label: 'Country', required: false },
       ],
-      addField: (field) =>
-        set((state) => ({ fields: [...state.fields, { ...field, id: crypto.randomUUID() }] })),
-      removeField: (id) =>
-        set((state) => ({ fields: state.fields.filter((f) => f.id !== id) })),
-      updateField: (id, updates) =>
-        set((state) => ({ fields: state.fields.map((f) => (f.id === id ? { ...f, ...updates } : f)) })),
-      reorderFields: (from, to) =>
-        set((state) => {
-          const fields = [...state.fields]
-          const [moved] = fields.splice(from, 1)
-          if (moved) fields.splice(to, 0, moved)
-          return { fields }
-        }),
+      addField: (field) => set((s) => ({ fields: [...s.fields, { ...field, id: crypto.randomUUID() }] })),
+      removeField: (id) => set((s) => ({ fields: s.fields.filter((f) => f.id !== id) })),
+      updateField: (id, updates) => set((s) => ({ fields: s.fields.map((f) => (f.id === id ? { ...f, ...updates } : f)) })),
+      reorderFields: (from, to) => set((s) => {
+        const fields = [...s.fields]
+        const [moved] = fields.splice(from, 1)
+        if (moved) fields.splice(to, 0, moved)
+        return { fields }
+      }),
       showSubmitButton: true,
       setShowSubmitButton: (showSubmitButton) => set({ showSubmitButton }),
       showLabels: true,
@@ -178,31 +190,11 @@ export const useBuilderStore = create<BuilderState>()(
         striped: true,
         showActions: true,
       },
-      setTableTitle: (title) =>
-        set((state) => ({ tableConfig: { ...state.tableConfig, title } })),
-      addColumn: (column) =>
-        set((state) => ({
-          tableConfig: {
-            ...state.tableConfig,
-            columns: [...state.tableConfig.columns, { ...column, id: crypto.randomUUID() }],
-          },
-        })),
-      removeColumn: (id) =>
-        set((state) => ({
-          tableConfig: {
-            ...state.tableConfig,
-            columns: state.tableConfig.columns.filter((c) => c.id !== id),
-          },
-        })),
-      updateColumn: (id, updates) =>
-        set((state) => ({
-          tableConfig: {
-            ...state.tableConfig,
-            columns: state.tableConfig.columns.map((c) => (c.id === id ? { ...c, ...updates } : c)),
-          },
-        })),
-      setTableOption: (key, value) =>
-        set((state) => ({ tableConfig: { ...state.tableConfig, [key]: value } })),
+      setTableTitle: (title) => set((s) => ({ tableConfig: { ...s.tableConfig, title } })),
+      addColumn: (column) => set((s) => ({ tableConfig: { ...s.tableConfig, columns: [...s.tableConfig.columns, { ...column, id: crypto.randomUUID() }] } })),
+      removeColumn: (id) => set((s) => ({ tableConfig: { ...s.tableConfig, columns: s.tableConfig.columns.filter((c) => c.id !== id) } })),
+      updateColumn: (id, updates) => set((s) => ({ tableConfig: { ...s.tableConfig, columns: s.tableConfig.columns.map((c) => (c.id === id ? { ...c, ...updates } : c)) } })),
+      setTableOption: (key, value) => set((s) => ({ tableConfig: { ...s.tableConfig, [key]: value } })),
 
       // Card
       cardConfig: {
@@ -229,36 +221,34 @@ export const useBuilderStore = create<BuilderState>()(
           { id: '4', label: 'Avg Session', value: '4m 32s', change: '+8.2%', trend: 'up' },
         ],
       },
-      setCardConfig: (updates) =>
-        set((state) => ({ cardConfig: { ...state.cardConfig, ...updates } })),
-      addCardAction: (action) =>
-        set((state) => ({
-          cardConfig: {
-            ...state.cardConfig,
-            actions: [...state.cardConfig.actions, { ...action, id: crypto.randomUUID() }],
-          },
-        })),
-      removeCardAction: (id) =>
-        set((state) => ({
-          cardConfig: {
-            ...state.cardConfig,
-            actions: state.cardConfig.actions.filter((a) => a.id !== id),
-          },
-        })),
-      addStatItem: (stat) =>
-        set((state) => ({
-          cardConfig: {
-            ...state.cardConfig,
-            stats: [...state.cardConfig.stats, { ...stat, id: crypto.randomUUID() }],
-          },
-        })),
-      removeStatItem: (id) =>
-        set((state) => ({
-          cardConfig: {
-            ...state.cardConfig,
-            stats: state.cardConfig.stats.filter((s) => s.id !== id),
-          },
-        })),
+      setCardConfig: (updates) => set((s) => ({ cardConfig: { ...s.cardConfig, ...updates } })),
+      addCardAction: (action) => set((s) => ({ cardConfig: { ...s.cardConfig, actions: [...s.cardConfig.actions, { ...action, id: crypto.randomUUID() }] } })),
+      removeCardAction: (id) => set((s) => ({ cardConfig: { ...s.cardConfig, actions: s.cardConfig.actions.filter((a) => a.id !== id) } })),
+      addStatItem: (stat) => set((s) => ({ cardConfig: { ...s.cardConfig, stats: [...s.cardConfig.stats, { ...stat, id: crypto.randomUUID() }] } })),
+      removeStatItem: (id) => set((s) => ({ cardConfig: { ...s.cardConfig, stats: s.cardConfig.stats.filter((st) => st.id !== id) } })),
+
+      // Navbar
+      navbarConfig: {
+        brand: 'MyApp',
+        showLogo: true,
+        variant: 'default',
+        links: [
+          { id: '1', label: 'Home', href: '/', active: true },
+          { id: '2', label: 'About', href: '/about', active: false },
+          { id: '3', label: 'Features', href: '/features', active: false },
+          { id: '4', label: 'Pricing', href: '/pricing', active: false },
+        ],
+        showAuthButtons: true,
+        loginLabel: 'Log in',
+        signupLabel: 'Sign up',
+        showSearch: false,
+        sticky: true,
+        showMobileMenu: true,
+      },
+      setNavbarConfig: (updates) => set((s) => ({ navbarConfig: { ...s.navbarConfig, ...updates } })),
+      addNavLink: (link) => set((s) => ({ navbarConfig: { ...s.navbarConfig, links: [...s.navbarConfig.links, { ...link, id: crypto.randomUUID() }] } })),
+      removeNavLink: (id) => set((s) => ({ navbarConfig: { ...s.navbarConfig, links: s.navbarConfig.links.filter((l) => l.id !== id) } })),
+      updateNavLink: (id, updates) => set((s) => ({ navbarConfig: { ...s.navbarConfig, links: s.navbarConfig.links.map((l) => (l.id === id ? { ...l, ...updates } : l)) } })),
     }),
     { name: 'builder-store' }
   )

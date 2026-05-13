@@ -1,4 +1,4 @@
-import type { Framework, TableConfig, CardConfig } from '@/stores/builder.store'
+import type { Framework, TableConfig, CardConfig, NavbarConfig } from '@/stores/builder.store'
 import type { FormConfig, GeneratorOutput } from './types'
 import { shadcnGenerator } from './shadcn.generator'
 import { muiGenerator } from './mui.generator'
@@ -7,20 +7,26 @@ import { angularMaterialGenerator } from './angular-material.generator'
 import { tailwindGenerator } from './tailwind.generator'
 import { generateShadcnTable, generateMuiTable, generateVuetifyTable, generateAngularTable, generateTailwindTable } from './table.generators'
 import { generateShadcnCard, generateMuiCard, generateVuetifyCard, generateAngularCard, generateTailwindCard } from './card.generators'
+import { generateShadcnNavbar, generateMuiNavbar, generateVuetifyNavbar, generateAngularNavbar, generateTailwindNavbar } from './navbar.generators'
 
 export function generateForm(framework: Framework, config: FormConfig): GeneratorOutput {
-  const generators = { shadcn: shadcnGenerator, mui: muiGenerator, vuetify: vuetifyGenerator, 'angular-material': angularMaterialGenerator, tailwind: tailwindGenerator }
-  return generators[framework].generateForm(config)
+  const g = { shadcn: shadcnGenerator, mui: muiGenerator, vuetify: vuetifyGenerator, 'angular-material': angularMaterialGenerator, tailwind: tailwindGenerator }
+  return g[framework].generateForm(config)
 }
 
 export function generateTable(framework: Framework, config: TableConfig): GeneratorOutput {
-  const generators = { shadcn: generateShadcnTable, mui: generateMuiTable, vuetify: generateVuetifyTable, 'angular-material': generateAngularTable, tailwind: generateTailwindTable }
-  return generators[framework](config)
+  const g = { shadcn: generateShadcnTable, mui: generateMuiTable, vuetify: generateVuetifyTable, 'angular-material': generateAngularTable, tailwind: generateTailwindTable }
+  return g[framework](config)
 }
 
 export function generateCard(framework: Framework, config: CardConfig): GeneratorOutput {
-  const generators = { shadcn: generateShadcnCard, mui: generateMuiCard, vuetify: generateVuetifyCard, 'angular-material': generateAngularCard, tailwind: generateTailwindCard }
-  return generators[framework](config)
+  const g = { shadcn: generateShadcnCard, mui: generateMuiCard, vuetify: generateVuetifyCard, 'angular-material': generateAngularCard, tailwind: generateTailwindCard }
+  return g[framework](config)
+}
+
+export function generateNavbar(framework: Framework, config: NavbarConfig): GeneratorOutput {
+  const g = { shadcn: generateShadcnNavbar, mui: generateMuiNavbar, vuetify: generateVuetifyNavbar, 'angular-material': generateAngularNavbar, tailwind: generateTailwindNavbar }
+  return g[framework](config)
 }
 
 export type { FormConfig, GeneratorOutput }

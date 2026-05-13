@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { useBuilderStore } from '@/stores/builder.store'
-import { generateForm, generateTable, generateCard } from '@/generators'
+import { generateForm, generateTable, generateCard, generateNavbar } from '@/generators'
 
 const CODE_TABS = [
   { id: 'component', label: 'Component' },
@@ -10,16 +10,15 @@ const CODE_TABS = [
 ]
 
 export function CodePanel() {
-  const { framework, componentType, formTitle, fields, showSubmitButton, showLabels, showValidation, tableConfig, cardConfig } = useBuilderStore()
+  const { framework, componentType, formTitle, fields, showSubmitButton, showLabels, showValidation, tableConfig, cardConfig, navbarConfig } = useBuilderStore()
   const [activeTab, setActiveTab] = useState('component')
   const [copied, setCopied] = useState(false)
 
   const output =
-    componentType === 'table'
-      ? generateTable(framework, tableConfig)
-      : componentType === 'card'
-        ? generateCard(framework, cardConfig)
-        : generateForm(framework, { title: formTitle, fields, showSubmitButton, showLabels, showValidation })
+    componentType === 'table' ? generateTable(framework, tableConfig)
+    : componentType === 'card' ? generateCard(framework, cardConfig)
+    : componentType === 'navbar' ? generateNavbar(framework, navbarConfig)
+    : generateForm(framework, { title: formTitle, fields, showSubmitButton, showLabels, showValidation })
 
   const displayCode = activeTab === 'imports' && output.imports ? output.imports.join('\n') : output.code
 
@@ -34,11 +33,8 @@ export function CodePanel() {
       <div className="flex items-center justify-between border-b border-neutral-200 px-3">
         <div className="flex">
           {CODE_TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                'border-b-2 px-3 py-2 text-xs font-medium transition-colors',
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className={cn('border-b-2 px-3 py-2 text-xs font-medium transition-colors',
                 activeTab === tab.id ? 'border-brand-600 text-brand-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'
               )}
             >
@@ -46,10 +42,7 @@ export function CodePanel() {
             </button>
           ))}
         </div>
-        <button
-          onClick={handleCopy}
-          className="flex items-center gap-1.5 rounded px-2 py-1 text-xs text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
-        >
+        <button onClick={handleCopy} className="flex items-center gap-1.5 rounded px-2 py-1 text-xs text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700">
           {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
           {copied ? 'Copied!' : 'Copy'}
         </button>
