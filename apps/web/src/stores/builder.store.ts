@@ -101,6 +101,21 @@ export type ModalType = 'default' | 'confirmation' | 'custom' | 'alert'
 export type ModalSize = 'sm' | 'md' | 'lg' | 'full'
 export type ModalAlertVariant = 'info' | 'success' | 'warning' | 'danger'
 
+// --- Alert ---
+export type AlertVariant = 'info' | 'success' | 'warning' | 'danger'
+export type AlertStyle = 'filled' | 'outlined' | 'soft'
+
+export interface AlertConfig {
+  variant: AlertVariant
+  style: AlertStyle
+  title: string
+  message: string
+  showIcon: boolean
+  dismissible: boolean
+  showAction: boolean
+  actionLabel: string
+}
+
 export interface ModalAction {
   id: string
   label: string
@@ -170,6 +185,10 @@ export interface BuilderState {
   setModalConfig: (updates: Partial<ModalConfig>) => void
   addModalAction: (action: Omit<ModalAction, 'id'>) => void
   removeModalAction: (id: string) => void
+
+  // Alert
+  alertConfig: AlertConfig
+  setAlertConfig: (updates: Partial<AlertConfig>) => void
 }
 
 export const useBuilderStore = create<BuilderState>()(
@@ -299,6 +318,19 @@ export const useBuilderStore = create<BuilderState>()(
       setModalConfig: (updates) => set((s) => ({ modalConfig: { ...s.modalConfig, ...updates } })),
       addModalAction: (action) => set((s) => ({ modalConfig: { ...s.modalConfig, actions: [...s.modalConfig.actions, { ...action, id: crypto.randomUUID() }] } })),
       removeModalAction: (id) => set((s) => ({ modalConfig: { ...s.modalConfig, actions: s.modalConfig.actions.filter((a) => a.id !== id) } })),
+
+      // Alert
+      alertConfig: {
+        variant: 'info',
+        style: 'soft',
+        title: 'Heads up!',
+        message: 'This is an alert message. You can customize the variant, style, and content.',
+        showIcon: true,
+        dismissible: true,
+        showAction: false,
+        actionLabel: 'Learn more',
+      },
+      setAlertConfig: (updates) => set((s) => ({ alertConfig: { ...s.alertConfig, ...updates } })),
     }),
     { name: 'builder-store' }
   )

@@ -6,11 +6,13 @@ import { TableConfigPanel } from '@/components/builder/TableConfigPanel'
 import { CardConfigPanel } from '@/components/builder/CardConfigPanel'
 import { NavbarConfigPanel } from '@/components/builder/NavbarConfigPanel'
 import { ModalConfigPanel } from '@/components/builder/ModalConfigPanel'
+import { AlertConfigPanel } from '@/components/builder/AlertConfigPanel'
 import { PreviewPanel } from '@/components/builder/PreviewPanel'
 import { TablePreview } from '@/components/builder/TablePreview'
 import { CardPreview } from '@/components/builder/CardPreview'
 import { NavbarPreview } from '@/components/builder/NavbarPreview'
 import { ModalPreview } from '@/components/builder/ModalPreview'
+import { AlertPreview } from '@/components/builder/AlertPreview'
 import { CodePanel } from '@/components/builder/CodePanel'
 import { useBuilderStore } from '@/stores/builder.store'
 
@@ -24,7 +26,7 @@ const CONFIG_PANELS = {
   card: CardConfigPanel,
   navbar: NavbarConfigPanel,
   modal: ModalConfigPanel,
-  alert: ConfigPanel,
+  alert: AlertConfigPanel,
 }
 
 const PREVIEW_PANELS = {
@@ -33,7 +35,7 @@ const PREVIEW_PANELS = {
   card: CardPreview,
   navbar: NavbarPreview,
   modal: ModalPreview,
-  alert: PreviewPanel,
+  alert: AlertPreview,
 }
 
 function BuilderPage() {

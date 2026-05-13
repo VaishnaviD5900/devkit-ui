@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { useBuilderStore } from '@/stores/builder.store'
-import { generateForm, generateTable, generateCard, generateNavbar, generateModal } from '@/generators'
+import { generateForm, generateTable, generateCard, generateNavbar, generateModal, generateAlert } from '@/generators'
 
 const CODE_TABS = [
   { id: 'component', label: 'Component' },
@@ -10,7 +10,7 @@ const CODE_TABS = [
 ]
 
 export function CodePanel() {
-  const { framework, componentType, formTitle, fields, showSubmitButton, showLabels, showValidation, tableConfig, cardConfig, navbarConfig, modalConfig } = useBuilderStore()
+  const { framework, componentType, formTitle, fields, showSubmitButton, showLabels, showValidation, tableConfig, cardConfig, navbarConfig, modalConfig, alertConfig } = useBuilderStore()
   const [activeTab, setActiveTab] = useState('component')
   const [copied, setCopied] = useState(false)
 
@@ -19,9 +19,10 @@ export function CodePanel() {
     : componentType === 'card' ? generateCard(framework, cardConfig)
     : componentType === 'navbar' ? generateNavbar(framework, navbarConfig)
     : componentType === 'modal' ? generateModal(framework, modalConfig)
+    : componentType === 'alert' ? generateAlert(framework, alertConfig)
     : generateForm(framework, { title: formTitle, fields, showSubmitButton, showLabels, showValidation })
 
-  const displayCode = activeTab === 'imports' && output.imports ? output.imports.join('\n') : output.code
+  const displayCode = activeTab === 'imports' && output.imports?.length ? output.imports.join('\n') : output.code
 
   async function handleCopy() {
     await navigator.clipboard.writeText(displayCode)
