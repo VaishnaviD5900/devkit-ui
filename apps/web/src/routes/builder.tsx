@@ -5,10 +5,12 @@ import { ConfigPanel } from '@/components/builder/ConfigPanel'
 import { TableConfigPanel } from '@/components/builder/TableConfigPanel'
 import { CardConfigPanel } from '@/components/builder/CardConfigPanel'
 import { NavbarConfigPanel } from '@/components/builder/NavbarConfigPanel'
+import { ModalConfigPanel } from '@/components/builder/ModalConfigPanel'
 import { PreviewPanel } from '@/components/builder/PreviewPanel'
 import { TablePreview } from '@/components/builder/TablePreview'
 import { CardPreview } from '@/components/builder/CardPreview'
 import { NavbarPreview } from '@/components/builder/NavbarPreview'
+import { ModalPreview } from '@/components/builder/ModalPreview'
 import { CodePanel } from '@/components/builder/CodePanel'
 import { useBuilderStore } from '@/stores/builder.store'
 
@@ -21,7 +23,7 @@ const CONFIG_PANELS = {
   table: TableConfigPanel,
   card: CardConfigPanel,
   navbar: NavbarConfigPanel,
-  modal: ConfigPanel,
+  modal: ModalConfigPanel,
   alert: ConfigPanel,
 }
 
@@ -30,7 +32,7 @@ const PREVIEW_PANELS = {
   table: TablePreview,
   card: CardPreview,
   navbar: NavbarPreview,
-  modal: PreviewPanel,
+  modal: ModalPreview,
   alert: PreviewPanel,
 }
 

@@ -1,4 +1,4 @@
-import type { Framework, TableConfig, CardConfig, NavbarConfig } from '@/stores/builder.store'
+import type { Framework, TableConfig, CardConfig, NavbarConfig, ModalConfig } from '@/stores/builder.store'
 import type { FormConfig, GeneratorOutput } from './types'
 import { shadcnGenerator } from './shadcn.generator'
 import { muiGenerator } from './mui.generator'
@@ -8,6 +8,7 @@ import { tailwindGenerator } from './tailwind.generator'
 import { generateShadcnTable, generateMuiTable, generateVuetifyTable, generateAngularTable, generateTailwindTable } from './table.generators'
 import { generateShadcnCard, generateMuiCard, generateVuetifyCard, generateAngularCard, generateTailwindCard } from './card.generators'
 import { generateShadcnNavbar, generateMuiNavbar, generateVuetifyNavbar, generateAngularNavbar, generateTailwindNavbar } from './navbar.generators'
+import { generateShadcnModal, generateMuiModal, generateVuetifyModal, generateAngularModal, generateTailwindModal } from './modal.generators'
 
 export function generateForm(framework: Framework, config: FormConfig): GeneratorOutput {
   const g = { shadcn: shadcnGenerator, mui: muiGenerator, vuetify: vuetifyGenerator, 'angular-material': angularMaterialGenerator, tailwind: tailwindGenerator }
@@ -26,6 +27,11 @@ export function generateCard(framework: Framework, config: CardConfig): Generato
 
 export function generateNavbar(framework: Framework, config: NavbarConfig): GeneratorOutput {
   const g = { shadcn: generateShadcnNavbar, mui: generateMuiNavbar, vuetify: generateVuetifyNavbar, 'angular-material': generateAngularNavbar, tailwind: generateTailwindNavbar }
+  return g[framework](config)
+}
+
+export function generateModal(framework: Framework, config: ModalConfig): GeneratorOutput {
+  const g = { shadcn: generateShadcnModal, mui: generateMuiModal, vuetify: generateVuetifyModal, 'angular-material': generateAngularModal, tailwind: generateTailwindModal }
   return g[framework](config)
 }
 

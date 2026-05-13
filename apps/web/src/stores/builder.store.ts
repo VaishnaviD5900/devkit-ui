@@ -96,6 +96,30 @@ export interface NavbarConfig {
   showMobileMenu: boolean
 }
 
+// --- Modal ---
+export type ModalType = 'default' | 'confirmation' | 'form' | 'alert'
+export type ModalSize = 'sm' | 'md' | 'lg' | 'full'
+export type ModalAlertVariant = 'info' | 'success' | 'warning' | 'danger'
+
+export interface ModalAction {
+  id: string
+  label: string
+  variant: 'primary' | 'secondary' | 'danger' | 'ghost'
+}
+
+export interface ModalConfig {
+  modalType: ModalType
+  title: string
+  description: string
+  size: ModalSize
+  showCloseButton: boolean
+  closeOnBackdrop: boolean
+  showFooter: boolean
+  actions: ModalAction[]
+  alertVariant: ModalAlertVariant
+  showIcon: boolean
+}
+
 // --- Store ---
 export interface BuilderState {
   framework: Framework
@@ -140,6 +164,12 @@ export interface BuilderState {
   addNavLink: (link: Omit<NavLink, 'id'>) => void
   removeNavLink: (id: string) => void
   updateNavLink: (id: string, updates: Partial<NavLink>) => void
+
+  // Modal
+  modalConfig: ModalConfig
+  setModalConfig: (updates: Partial<ModalConfig>) => void
+  addModalAction: (action: Omit<ModalAction, 'id'>) => void
+  removeModalAction: (id: string) => void
 }
 
 export const useBuilderStore = create<BuilderState>()(
@@ -249,6 +279,26 @@ export const useBuilderStore = create<BuilderState>()(
       addNavLink: (link) => set((s) => ({ navbarConfig: { ...s.navbarConfig, links: [...s.navbarConfig.links, { ...link, id: crypto.randomUUID() }] } })),
       removeNavLink: (id) => set((s) => ({ navbarConfig: { ...s.navbarConfig, links: s.navbarConfig.links.filter((l) => l.id !== id) } })),
       updateNavLink: (id, updates) => set((s) => ({ navbarConfig: { ...s.navbarConfig, links: s.navbarConfig.links.map((l) => (l.id === id ? { ...l, ...updates } : l)) } })),
+
+      // Modal
+      modalConfig: {
+        modalType: 'default',
+        title: 'Modal title',
+        description: 'This is the modal description. Add any content or context here.',
+        size: 'md',
+        showCloseButton: true,
+        closeOnBackdrop: true,
+        showFooter: true,
+        alertVariant: 'info',
+        showIcon: true,
+        actions: [
+          { id: '1', label: 'Cancel', variant: 'secondary' },
+          { id: '2', label: 'Confirm', variant: 'primary' },
+        ],
+      },
+      setModalConfig: (updates) => set((s) => ({ modalConfig: { ...s.modalConfig, ...updates } })),
+      addModalAction: (action) => set((s) => ({ modalConfig: { ...s.modalConfig, actions: [...s.modalConfig.actions, { ...action, id: crypto.randomUUID() }] } })),
+      removeModalAction: (id) => set((s) => ({ modalConfig: { ...s.modalConfig, actions: s.modalConfig.actions.filter((a) => a.id !== id) } })),
     }),
     { name: 'builder-store' }
   )
