@@ -15,6 +15,7 @@ import { NavbarPreview } from '@/components/builder/NavbarPreview'
 import { ModalPreview } from '@/components/builder/ModalPreview'
 import { AlertPreview } from '@/components/builder/AlertPreview'
 import { ToastPreview } from '@/components/builder/ToastPreview'
+import { PlaceholderPanel, PlaceholderPreview } from '@/components/builder/PlaceholderPanel'
 import { CodePanel } from '@/components/builder/CodePanel'
 import { useBuilderStore } from '@/stores/builder.store'
 
@@ -30,6 +31,11 @@ const CONFIG_PANELS = {
   modal: ModalConfigPanel,
   alert: AlertConfigPanel,
   toast: ToastConfigPanel,
+  tabs: PlaceholderPanel,
+  badge: PlaceholderPanel,
+  accordion: PlaceholderPanel,
+  tooltip: PlaceholderPanel,
+  breadcrumb: PlaceholderPanel,
 }
 
 const PREVIEW_PANELS = {
@@ -40,6 +46,11 @@ const PREVIEW_PANELS = {
   modal: ModalPreview,
   alert: AlertPreview,
   toast: ToastPreview,
+  tabs: PlaceholderPreview,
+  badge: PlaceholderPreview,
+  accordion: PlaceholderPreview,
+  tooltip: PlaceholderPreview,
+  breadcrumb: PlaceholderPreview,
 }
 
 function BuilderPage() {

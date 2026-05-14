@@ -6,6 +6,11 @@ import {
   Square,
   Bell,
   BellRing,
+  PanelTop,
+  Tag,
+  ChevronRight,
+  ListCollapse,
+  MessageSquare,
   Palette,
   Type,
   Ruler,
@@ -13,7 +18,7 @@ import {
 import { cn } from '@/lib/cn'
 import { useBuilderStore, type ComponentType } from '@/stores/builder.store'
 
-const COMPONENTS: { type: ComponentType; label: string; icon: React.ReactNode }[] = [
+const COMPONENTS: { type: ComponentType; label: string; icon: React.ReactNode; comingSoon?: boolean }[] = [
   { type: 'form', label: 'Form', icon: <LayoutTemplate size={15} /> },
   { type: 'table', label: 'Table', icon: <Table size={15} /> },
   { type: 'card', label: 'Card', icon: <CreditCard size={15} /> },
@@ -21,6 +26,11 @@ const COMPONENTS: { type: ComponentType; label: string; icon: React.ReactNode }[
   { type: 'modal', label: 'Modal', icon: <Square size={15} /> },
   { type: 'alert', label: 'Alert', icon: <Bell size={15} /> },
   { type: 'toast', label: 'Toast', icon: <BellRing size={15} /> },
+  { type: 'tabs', label: 'Tabs', icon: <PanelTop size={15} /> },
+  { type: 'badge', label: 'Badge', icon: <Tag size={15} /> },
+  { type: 'accordion', label: 'Accordion', icon: <ListCollapse size={15} /> },
+  { type: 'tooltip', label: 'Tooltip', icon: <MessageSquare size={15} /> },
+  { type: 'breadcrumb', label: 'Breadcrumb', icon: <ChevronRight size={15} /> },
 ]
 
 const THEME_ITEMS = [
@@ -33,7 +43,7 @@ export function Sidebar() {
   const { componentType, setComponentType } = useBuilderStore()
 
   return (
-    <aside className="flex w-48 flex-shrink-0 flex-col border-r border-neutral-200 bg-white py-3">
+    <aside className="flex w-48 flex-shrink-0 flex-col overflow-y-auto border-r border-neutral-200 bg-white py-3">
       <div className="mb-1">
         <p className="px-4 pb-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
           Components

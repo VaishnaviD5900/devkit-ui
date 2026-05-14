@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
 export type Framework = 'shadcn' | 'mui' | 'vuetify' | 'angular-material' | 'tailwind'
-export type ComponentType = 'form' | 'card' | 'table' | 'navbar' | 'modal' | 'alert' | 'toast'
+export type ComponentType = 'form' | 'card' | 'table' | 'navbar' | 'modal' | 'alert' | 'toast' | 'tabs' | 'badge' | 'accordion' | 'tooltip' | 'breadcrumb'
 
 // --- Form ---
 export type FieldType = 'text' | 'email' | 'password' | 'number' | 'textarea' | 'select' | 'autocomplete' | 'checkbox' | 'radio' | 'date'
