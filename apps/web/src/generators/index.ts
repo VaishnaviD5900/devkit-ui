@@ -1,4 +1,4 @@
-import type { Framework, TableConfig, CardConfig, NavbarConfig, ModalConfig, AlertConfig } from '@/stores/builder.store'
+import type { Framework, TableConfig, CardConfig, NavbarConfig, ModalConfig, AlertConfig, ToastConfig } from '@/stores/builder.store'
 import type { FormConfig, GeneratorOutput } from './types'
 import { shadcnGenerator } from './shadcn.generator'
 import { muiGenerator } from './mui.generator'
@@ -10,6 +10,7 @@ import { generateShadcnCard, generateMuiCard, generateVuetifyCard, generateAngul
 import { generateShadcnNavbar, generateMuiNavbar, generateVuetifyNavbar, generateAngularNavbar, generateTailwindNavbar } from './navbar.generators'
 import { generateShadcnModal, generateMuiModal, generateVuetifyModal, generateAngularModal, generateTailwindModal } from './modal.generators'
 import { generateShadcnAlert, generateMuiAlert, generateVuetifyAlert, generateAngularAlert, generateTailwindAlert } from './alert.generators'
+import { generateShadcnToast, generateMuiToast, generateVuetifyToast, generateAngularToast, generateTailwindToast } from './toast.generators'
 
 export function generateForm(framework: Framework, config: FormConfig): GeneratorOutput {
   const g = { shadcn: shadcnGenerator, mui: muiGenerator, vuetify: vuetifyGenerator, 'angular-material': angularMaterialGenerator, tailwind: tailwindGenerator }
@@ -33,6 +34,10 @@ export function generateModal(framework: Framework, config: ModalConfig): Genera
 }
 export function generateAlert(framework: Framework, config: AlertConfig): GeneratorOutput {
   const g = { shadcn: generateShadcnAlert, mui: generateMuiAlert, vuetify: generateVuetifyAlert, 'angular-material': generateAngularAlert, tailwind: generateTailwindAlert }
+  return g[framework](config)
+}
+export function generateToast(framework: Framework, config: ToastConfig): GeneratorOutput {
+  const g = { shadcn: generateShadcnToast, mui: generateMuiToast, vuetify: generateVuetifyToast, 'angular-material': generateAngularToast, tailwind: generateTailwindToast }
   return g[framework](config)
 }
 

@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
 export type Framework = 'shadcn' | 'mui' | 'vuetify' | 'angular-material' | 'tailwind'
-export type ComponentType = 'form' | 'card' | 'table' | 'navbar' | 'modal' | 'alert'
+export type ComponentType = 'form' | 'card' | 'table' | 'navbar' | 'modal' | 'alert' | 'toast'
 
 // --- Form ---
 export type FieldType = 'text' | 'email' | 'password' | 'number' | 'textarea' | 'select' | 'autocomplete' | 'checkbox' | 'radio' | 'date'
@@ -116,6 +116,24 @@ export interface AlertConfig {
   actionLabel: string
 }
 
+
+// --- Toast ---
+export type ToastVariant = 'info' | 'success' | 'warning' | 'danger' | 'default'
+export type ToastPosition = 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'
+
+export interface ToastConfig {
+  variant: ToastVariant
+  position: ToastPosition
+  title: string
+  message: string
+  showIcon: boolean
+  autoDismiss: boolean
+  duration: number
+  showProgress: boolean
+  showAction: boolean
+  actionLabel: string
+  showCloseButton: boolean
+}
 export interface ModalAction {
   id: string
   label: string
@@ -189,6 +207,10 @@ export interface BuilderState {
   // Alert
   alertConfig: AlertConfig
   setAlertConfig: (updates: Partial<AlertConfig>) => void
+
+  // Toast
+  toastConfig: ToastConfig
+  setToastConfig: (updates: Partial<ToastConfig>) => void
 }
 
 export const useBuilderStore = create<BuilderState>()(
@@ -331,7 +353,24 @@ export const useBuilderStore = create<BuilderState>()(
         actionLabel: 'Learn more',
       },
       setAlertConfig: (updates) => set((s) => ({ alertConfig: { ...s.alertConfig, ...updates } })),
+
+      // Toast
+      toastConfig: {
+        variant: 'success',
+        position: 'bottom-right',
+        title: 'Changes saved!',
+        message: 'Your changes have been saved successfully.',
+        showIcon: true,
+        autoDismiss: true,
+        duration: 4000,
+        showProgress: true,
+        showAction: false,
+        actionLabel: 'Undo',
+        showCloseButton: true,
+      },
+      setToastConfig: (updates) => set((s) => ({ toastConfig: { ...s.toastConfig, ...updates } })),
     }),
     { name: 'builder-store' }
   )
 )
+

@@ -5,6 +5,7 @@ import {
   Navigation,
   Square,
   Bell,
+  BellRing,
   Palette,
   Type,
   Ruler,
@@ -19,6 +20,7 @@ const COMPONENTS: { type: ComponentType; label: string; icon: React.ReactNode }[
   { type: 'navbar', label: 'Navbar', icon: <Navigation size={15} /> },
   { type: 'modal', label: 'Modal', icon: <Square size={15} /> },
   { type: 'alert', label: 'Alert', icon: <Bell size={15} /> },
+  { type: 'toast', label: 'Toast', icon: <BellRing size={15} /> },
 ]
 
 const THEME_ITEMS = [

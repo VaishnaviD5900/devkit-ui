@@ -7,12 +7,14 @@ import { CardConfigPanel } from '@/components/builder/CardConfigPanel'
 import { NavbarConfigPanel } from '@/components/builder/NavbarConfigPanel'
 import { ModalConfigPanel } from '@/components/builder/ModalConfigPanel'
 import { AlertConfigPanel } from '@/components/builder/AlertConfigPanel'
+import { ToastConfigPanel } from '@/components/builder/ToastConfigPanel'
 import { PreviewPanel } from '@/components/builder/PreviewPanel'
 import { TablePreview } from '@/components/builder/TablePreview'
 import { CardPreview } from '@/components/builder/CardPreview'
 import { NavbarPreview } from '@/components/builder/NavbarPreview'
 import { ModalPreview } from '@/components/builder/ModalPreview'
 import { AlertPreview } from '@/components/builder/AlertPreview'
+import { ToastPreview } from '@/components/builder/ToastPreview'
 import { CodePanel } from '@/components/builder/CodePanel'
 import { useBuilderStore } from '@/stores/builder.store'
 
@@ -27,6 +29,7 @@ const CONFIG_PANELS = {
   navbar: NavbarConfigPanel,
   modal: ModalConfigPanel,
   alert: AlertConfigPanel,
+  toast: ToastConfigPanel,
 }
 
 const PREVIEW_PANELS = {
@@ -36,6 +39,7 @@ const PREVIEW_PANELS = {
   navbar: NavbarPreview,
   modal: ModalPreview,
   alert: AlertPreview,
+  toast: ToastPreview,
 }
 
 function BuilderPage() {
