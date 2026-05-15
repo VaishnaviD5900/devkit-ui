@@ -304,7 +304,7 @@ export function generateTailwindAlert(config: AlertConfig): GeneratorOutput {
   const code = `${imports.length ? imports.join('\n') + '\n\n' : ''}export function ${componentName}Alert() {
   ${dismissible ? 'const [visible, setVisible] = useState(true)\n  if (!visible) return null\n' : ''}
   return (
-    <div role="alert" className="flex items-start gap-3 rounded-lg px-4 py-3.5 ${containerClass}">
+    <div role="alert" aria-live="polite" aria-atomic="true" className="flex items-start gap-3 rounded-lg px-4 py-3.5 ${containerClass}">
       ${showIcon ? `<span className="mt-0.5 flex-shrink-0 ${iconClass}">
         ${iconSvg[variant]}
       </span>` : ''}
@@ -320,6 +320,7 @@ export function generateTailwindAlert(config: AlertConfig): GeneratorOutput {
       </div>
       ${dismissible ? `<button
         onClick={() => setVisible(false)}
+        aria-label="Dismiss alert"
         className="flex-shrink-0 rounded p-0.5 opacity-60 transition-opacity hover:opacity-100"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>

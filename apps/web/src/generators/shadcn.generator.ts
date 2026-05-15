@@ -3,8 +3,9 @@ import type { FormField } from '@/stores/builder.store'
 
 function getFormFieldComponent(field: FormField, showLabels: boolean, showValidation: boolean): string {
   const required = showValidation && field.required
-  const requiredAttr = required ? '\n          required' : ''
+  const requiredAttr = required ? '\n          required\n          aria-required="true"' : ''
   const helperText = field.helperText ? `\n          description="${field.helperText}"` : ''
+  const describedBy = field.helperText ? `\n          aria-describedby="${field.name}-description"` : ''
 
   if (field.type === 'textarea') {
     return `
@@ -16,11 +17,12 @@ function getFormFieldComponent(field: FormField, showLabels: boolean, showValida
             ${showLabels ? `<FormLabel>${field.label ?? field.name}</FormLabel>` : ''}
             <FormControl>
               <Textarea
-                placeholder="${field.placeholder ?? ''}"${requiredAttr}
+                placeholder="${field.placeholder ?? ''}"${requiredAttr}${describedBy}
+                aria-invalid={!!form.formState.errors.${field.name}}
                 {...field}
               />
-            </FormControl>${helperText ? `\n            <FormDescription>${field.helperText}</FormDescription>` : ''}
-            <FormMessage />
+            </FormControl>${helperText ? `\n            <FormDescription id="${field.name}-description">${field.helperText}</FormDescription>` : ''}
+            <FormMessage role="alert" />
           </FormItem>
         )}
       />`
@@ -36,7 +38,7 @@ function getFormFieldComponent(field: FormField, showLabels: boolean, showValida
             ${showLabels ? `<FormLabel>${field.label ?? field.name}</FormLabel>` : ''}
             <Select onValueChange={field.onChange} defaultValue={field.value}>
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger aria-label="Select ${field.label?.toLowerCase() ?? field.name}"${required ? ' aria-required="true"' : ''}>
                   <SelectValue placeholder="Select ${field.label?.toLowerCase() ?? field.name}..." />
                 </SelectTrigger>
               </FormControl>
@@ -44,8 +46,8 @@ function getFormFieldComponent(field: FormField, showLabels: boolean, showValida
                 <SelectItem value="option1">Option 1</SelectItem>
                 <SelectItem value="option2">Option 2</SelectItem>
               </SelectContent>
-            </Select>${helperText ? `\n            <FormDescription>${field.helperText}</FormDescription>` : ''}
-            <FormMessage />
+            </Select>${helperText ? `\n            <FormDescription id="${field.name}-description">${field.helperText}</FormDescription>` : ''}
+            <FormMessage role="alert" />
           </FormItem>
         )}
       />`
@@ -62,10 +64,11 @@ function getFormFieldComponent(field: FormField, showLabels: boolean, showValida
               <Checkbox
                 checked={field.value}
                 onCheckedChange={field.onChange}
+                aria-label="${field.label ?? field.name}"
               />
             </FormControl>
             ${showLabels ? `<FormLabel className="font-normal">${field.label ?? field.name}</FormLabel>` : ''}
-            <FormMessage />
+            <FormMessage role="alert" />
           </FormItem>
         )}
       />`
@@ -81,11 +84,12 @@ function getFormFieldComponent(field: FormField, showLabels: boolean, showValida
             <FormControl>
               <Input
                 type="${field.type}"
-                placeholder="${field.placeholder ?? ''}"${requiredAttr}
+                placeholder="${field.placeholder ?? ''}"${requiredAttr}${describedBy}
+                aria-invalid={!!form.formState.errors.${field.name}}
                 {...field}
               />
-            </FormControl>${helperText ? `\n            <FormDescription>${field.helperText}</FormDescription>` : ''}
-            <FormMessage />
+            </FormControl>${helperText ? `\n            <FormDescription id="${field.name}-description">${field.helperText}</FormDescription>` : ''}
+            <FormMessage role="alert" />
           </FormItem>
         )}
       />`
@@ -158,10 +162,15 @@ ${defaultValues}
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <h2 className="text-lg font-semibold">${title}</h2>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4"
+        aria-label="${title} form"
+        noValidate
+      >
+        <h2 className="text-lg font-semibold" id="${componentName.toLowerCase()}-title">${title}</h2>
 ${fieldComponents}
-        ${showSubmitButton ? `<Button type="submit">Submit</Button>` : ''}
+        ${showSubmitButton ? `<Button type="submit" aria-label="Submit ${title} form">Submit</Button>` : ''}
       </form>
     </Form>
   )

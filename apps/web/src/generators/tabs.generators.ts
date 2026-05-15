@@ -289,7 +289,7 @@ export function generateTailwindTabs(config: TabsConfig): GeneratorOutput {
 
   const tabPanelsCode = items
     .map((t) => `        {active === "${t.id}" && (
-          <div>
+          <div role="tabpanel" id="panel-${t.id}" aria-labelledby="tab-${t.id}" tabIndex={0}>
             <h3 className="mb-2 font-semibold text-gray-900">${t.label}</h3>
             <p className="text-sm text-gray-600">${t.content}</p>
           </div>
@@ -303,7 +303,7 @@ export function TabsDemo() {
 
   return (
     <div className="${isVertical ? 'flex gap-0' : 'flex flex-col'}">
-      <div className="${getListClass(variant)}${isVertical ? ' w-40' : ''}">
+      <div role="tablist" aria-orientation="${orientation}" className="${getListClass(variant)}${isVertical ? ' w-40' : ''}">
 ${tabButtonsCode}
       </div>
       <div className="flex-1 rounded-lg border border-gray-200 bg-white p-5${variant === 'boxed' && !isVertical ? ' rounded-tl-none border-t-0' : ''}${isVertical ? ' rounded-tl-none' : ''}">

@@ -35,7 +35,7 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
-    <header className={cn("${navClass}", "${sticky ? 'sticky top-0 z-50' : ''}", "w-full")}>
+    <header role="banner" className={cn("${navClass}", "${sticky ? 'sticky top-0 z-50' : ''}", "w-full")}>
       <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         {/* Brand */}
         <a href="/" className="flex items-center gap-2 font-semibold">
@@ -46,7 +46,7 @@ export function Navbar() {
         </a>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Main navigation">
 ${linksJSX}
         </nav>
 
@@ -314,7 +314,7 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
-    <header className="${navBg}${sticky ? ' sticky top-0 z-50' : ''}">
+    <header role="banner" className="${navBg}${sticky ? ' sticky top-0 z-50' : ''}">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         {/* Brand */}
         <a href="/" className="flex items-center gap-2 no-underline">
@@ -325,7 +325,7 @@ export function Navbar() {
         </a>
 
         {/* Desktop links */}
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Main navigation">
           ${links.map((l) => `<a href="${l.href}" className="rounded-md px-3 py-1.5 text-sm transition-colors ${l.active ? textActive : `${textBase} hover:${isDark ? 'text-white bg-white/10' : 'text-gray-900 bg-gray-100'}`}">${l.label}</a>`).join('\n          ')}
         </nav>
 

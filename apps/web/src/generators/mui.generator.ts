@@ -151,6 +151,7 @@ ${hasSelect ? `
       component="form"
       onSubmit={handleSubmit}
       noValidate
+      aria-label="${title} form"
       sx={{ display: "flex", flexDirection: "column", gap: 2 }}
     >
       <Typography variant="h6">${title}</Typography>

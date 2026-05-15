@@ -3,36 +3,38 @@ import type { FormField } from '@/stores/builder.store'
 
 function getTailwindFieldComponent(field: FormField, showLabels: boolean, showValidation: boolean): string {
   const required = showValidation && field.required
-  const requiredAttr = required ? ' required' : ''
-  const baseInput = `w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50`
+  const requiredAttr = required ? ' required aria-required="true"' : ''
+  const baseInput = `w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50`
+  const errorClass = required ? ` aria-invalid={!!errors.${field.name}}` : ''
+  const describedBy = required ? ` aria-describedby="${field.name}-error"` : ''
 
   if (field.type === 'textarea') {
     return `      <div className="flex flex-col gap-1.5">
         ${showLabels ? `<label htmlFor="${field.name}" className="text-sm font-medium text-gray-700">
-          ${field.label ?? field.name}${required ? ' <span className="text-red-500">*</span>' : ''}
+          ${field.label ?? field.name}${required ? ' <span className="text-red-500" aria-hidden="true">*</span>' : ''}
         </label>` : ''}
         <textarea
           id="${field.name}"
           name="${field.name}"
           placeholder="${field.placeholder ?? ''}"
           rows={4}
-          className="${baseInput} resize-none"${requiredAttr}
+          className="${baseInput} resize-none"${requiredAttr}${errorClass}${describedBy}
           value={formData.${field.name} as string}
           onChange={handleChange}
         />
-        ${showValidation && required ? `{errors.${field.name} && <p className="text-xs text-red-500">{errors.${field.name}}</p>}` : ''}
+        ${showValidation && required ? `{errors.${field.name} && <p id="${field.name}-error" role="alert" className="text-xs text-red-500">{errors.${field.name}}</p>}` : ''}
       </div>`
   }
 
   if (field.type === 'select' || field.type === 'autocomplete') {
     return `      <div className="flex flex-col gap-1.5">
         ${showLabels ? `<label htmlFor="${field.name}" className="text-sm font-medium text-gray-700">
-          ${field.label ?? field.name}${required ? ' <span className="text-red-500">*</span>' : ''}
+          ${field.label ?? field.name}${required ? ' <span className="text-red-500" aria-hidden="true">*</span>' : ''}
         </label>` : ''}
         <select
           id="${field.name}"
           name="${field.name}"
-          className="${baseInput} bg-white"${requiredAttr}
+          className="${baseInput} bg-white"${requiredAttr}${errorClass}${describedBy}
           value={formData.${field.name} as string}
           onChange={handleChange}
         >
@@ -40,7 +42,7 @@ function getTailwindFieldComponent(field: FormField, showLabels: boolean, showVa
           <option value="option1">Option 1</option>
           <option value="option2">Option 2</option>
         </select>
-        ${showValidation && required ? `{errors.${field.name} && <p className="text-xs text-red-500">{errors.${field.name}}</p>}` : ''}
+        ${showValidation && required ? `{errors.${field.name} && <p id="${field.name}-error" role="alert" className="text-xs text-red-500">{errors.${field.name}}</p>}` : ''}
       </div>`
   }
 
@@ -50,7 +52,7 @@ function getTailwindFieldComponent(field: FormField, showLabels: boolean, showVa
           id="${field.name}"
           name="${field.name}"
           type="checkbox"
-          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
           checked={formData.${field.name} as boolean}
           onChange={handleChange}
         />
@@ -62,18 +64,20 @@ function getTailwindFieldComponent(field: FormField, showLabels: boolean, showVa
 
   return `      <div className="flex flex-col gap-1.5">
         ${showLabels ? `<label htmlFor="${field.name}" className="text-sm font-medium text-gray-700">
-          ${field.label ?? field.name}${required ? ' <span className="text-red-500">*</span>' : ''}
+          ${field.label ?? field.name}${required ? ' <span className="text-red-500" aria-hidden="true">*</span>' : ''}
         </label>` : ''}
         <input
           id="${field.name}"
           name="${field.name}"
           type="${field.type}"
           placeholder="${field.placeholder ?? ''}"
-          className="${baseInput}"${requiredAttr}
+          className="${baseInput}"${requiredAttr}${errorClass}${describedBy}
           value={formData.${field.name} as string}
           onChange={handleChange}
+          ${field.type === 'password' ? 'autoComplete="current-password"' : ''}
+          ${field.type === 'email' ? 'autoComplete="email"' : ''}
         />
-        ${showValidation && required ? `{errors.${field.name} && <p className="text-xs text-red-500">{errors.${field.name}}</p>}` : ''}
+        ${showValidation && required ? `{errors.${field.name} && <p id="${field.name}-error" role="alert" className="text-xs text-red-500">{errors.${field.name}}</p>}` : ''}
       </div>`
 }
 
@@ -142,8 +146,15 @@ ${validationLogic}
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <h2 className="text-lg font-semibold text-gray-900">${title}</h2>
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-4"
+      aria-label="${title} form"
+      noValidate
+    >
+      <h2 className="text-lg font-semibold text-gray-900" id="${componentName.toLowerCase()}-title">
+        ${title}
+      </h2>
 
 ${fieldComponents}
 

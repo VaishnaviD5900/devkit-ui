@@ -130,7 +130,7 @@ export const angularMaterialGenerator: FrameworkGenerator = {
     ${fields.some((f) => f.type === 'checkbox') ? 'MatCheckboxModule,' : ''}
   ],
   template: \`
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4" aria-label="${title} form" novalidate>
       <h2 class="text-xl font-semibold">${title}</h2>
 
 ${fieldTemplates}

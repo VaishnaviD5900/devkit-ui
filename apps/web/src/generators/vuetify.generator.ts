@@ -62,7 +62,7 @@ export const vuetifyGenerator: FrameworkGenerator = {
       .join('\n\n')
 
     const code = `<template>
-  <v-form ref="formRef" @submit.prevent="handleSubmit">
+  <v-form ref="formRef" @submit.prevent="handleSubmit" aria-label="${title} form">
     <v-container>
       <v-row>
         <v-col cols="12">

@@ -31,9 +31,9 @@ export function generateShadcnTable(config: TableConfig): GeneratorOutput {
       (c) => `  {
     accessorKey: "${c.name}",
     header: ${c.sortable ? `({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")} aria-label="Sort by ${c.label}">
         ${c.label}
-        <ArrowUpDown className="ml-2 h-4 w-4" />
+        <ArrowUpDown className="ml-2 h-4 w-4" aria-hidden="true" />
       </Button>
     )` : `"${c.label}"`},
     ${c.type === 'badge' ? `cell: ({ row }) => (
@@ -453,16 +453,17 @@ export function ${componentName}Table() {
           placeholder="Search..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="h-8 rounded-md border border-gray-300 px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          aria-label="Search table"
+          className="h-8 rounded-md border border-gray-300 px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
         />` : ''}
       </div>
 
       <div className="overflow-hidden rounded-lg border border-gray-200">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm" role="grid" aria-label="${title}">
           <thead className="bg-gray-50">
             <tr>
-              ${dataColumns.map((c) => `<th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">${c.label}</th>`).join('\n              ')}
-              ${showActions ? `<th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Actions</th>` : ''}
+              ${dataColumns.map((c) => `<th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">${c.label}</th>`).join('\n              ')}
+              ${showActions ? `<th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Actions</th>` : ''}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
@@ -478,8 +479,8 @@ export function ${componentName}Table() {
                   .join('\n                ')}
                 ${showActions ? `<td className="px-4 py-3">
                   <div className="flex gap-2">
-                    <button onClick={() => console.log("edit", row)} className="text-xs text-blue-600 hover:underline">Edit</button>
-                    <button onClick={() => console.log("delete", row)} className="text-xs text-red-500 hover:underline">Delete</button>
+                    <button onClick={() => console.log("edit", row)} aria-label="Edit row" className="text-xs text-blue-600 hover:underline">Edit</button>
+                    <button onClick={() => console.log("delete", row)} aria-label="Delete row" className="text-xs text-red-500 hover:underline">Delete</button>
                   </div>
                 </td>` : ''}
               </tr>
@@ -491,8 +492,8 @@ export function ${componentName}Table() {
       ${showPagination ? `<div className="flex items-center justify-between text-sm text-gray-500">
         <span>Page {page} of {totalPages}</span>
         <div className="flex gap-2">
-          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="rounded border px-3 py-1 disabled:opacity-40 hover:bg-gray-50">Previous</button>
-          <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="rounded border px-3 py-1 disabled:opacity-40 hover:bg-gray-50">Next</button>
+          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} aria-label="Previous page" className="rounded border px-3 py-1 disabled:opacity-40 hover:bg-gray-50">Previous</button>
+          <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} aria-label="Next page" className="rounded border px-3 py-1 disabled:opacity-40 hover:bg-gray-50">Next</button>
         </div>
       </div>` : ''}
     </div>

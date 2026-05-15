@@ -25,8 +25,8 @@ export function generateShadcnCard(config: CardConfig): GeneratorOutput {
 
   if (cardType === 'basic') {
     body = `
-    <Card className="max-w-sm">
-      ${showImage ? `<img src="/placeholder.jpg" alt="card" className="h-48 w-full rounded-t-lg object-cover" />` : ''}
+    <Card className="max-w-sm" role="article" aria-label="${title}">
+      ${showImage ? `<img src="/placeholder.jpg" alt="${title} card image" className="h-48 w-full rounded-t-lg object-cover" />` : ''}
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -37,13 +37,13 @@ export function generateShadcnCard(config: CardConfig): GeneratorOutput {
         </div>
       </CardHeader>
       <CardContent><p className="text-sm text-muted-foreground">${description}</p></CardContent>
-      ${showFooter && actions.length ? `<CardFooter className="justify-end gap-2">${actions.map((a) => `<Button variant="${btnVariant(a.variant)}">${a.label}</Button>`).join('')}</CardFooter>` : ''}
+      ${showFooter && actions.length ? `<CardFooter className="justify-end gap-2">${actions.map((a) => `<Button variant="${btnVariant(a.variant)}" aria-label="${a.label}">${a.label}</Button>`).join('')}</CardFooter>` : ''}
     </Card>`
   }
 
   if (cardType === 'profile') {
     body = `
-    <Card className="max-w-sm overflow-hidden">
+    <Card className="max-w-sm overflow-hidden" role="article" aria-label="${title}">
       <div className="h-20 bg-gradient-to-r from-primary/60 to-primary" />
       <CardHeader className="-mt-8">
         <div className="flex items-end justify-between">
@@ -61,7 +61,7 @@ export function generateShadcnCard(config: CardConfig): GeneratorOutput {
           <div><p className="font-semibold">312</p><p className="text-muted-foreground text-xs">Following</p></div>
         </div>
       </CardContent>
-      ${showFooter && actions.length ? `<CardFooter className="gap-2">${actions.map((a) => `<Button variant="${btnVariant(a.variant)}">${a.label}</Button>`).join('')}</CardFooter>` : ''}
+      ${showFooter && actions.length ? `<CardFooter className="gap-2">${actions.map((a) => `<Button variant="${btnVariant(a.variant)}" aria-label="${a.label}">${a.label}</Button>`).join('')}</CardFooter>` : ''}
     </Card>`
   }
 
@@ -88,15 +88,15 @@ export function generateShadcnCard(config: CardConfig): GeneratorOutput {
 
   if (cardType === 'product') {
     body = `
-    <Card className="max-w-xs overflow-hidden">
+    <Card className="max-w-xs overflow-hidden" role="article" aria-label="${title}">
       <div className="relative">
-        <img src="/placeholder.jpg" alt="${title}" className="h-48 w-full object-cover" />
+        <img src="/placeholder.jpg" alt="${title} product image" className="h-48 w-full object-cover" />
         ${showBadge ? `<Badge className="absolute left-3 top-3 bg-destructive">${badgeText}</Badge>` : ''}
       </div>
       <CardHeader>
         <div className="flex items-start justify-between">
           <div><CardTitle className="text-base">${title}</CardTitle><CardDescription>${subtitle}</CardDescription></div>
-          <div className="flex items-center gap-1 text-amber-400"><Star size={14} fill="currentColor" /><span className="text-xs font-medium text-foreground">4.8</span></div>
+          <div className="flex items-center gap-1 text-amber-400"><Star size={14} fill="currentColor" aria-hidden="true" /><span className="text-xs font-medium text-foreground"><span className="sr-only">Rating: </span>4.8</span></div>
         </div>
       </CardHeader>
       <CardContent>
@@ -104,7 +104,7 @@ export function generateShadcnCard(config: CardConfig): GeneratorOutput {
         <div className="mt-3 flex items-center gap-3"><span className="text-xl font-bold">$49.99</span><span className="text-sm text-muted-foreground line-through">$79.99</span></div>
       </CardContent>
       <CardFooter className="gap-2">
-        ${actions.length ? actions.map((a) => `<Button variant="${btnVariant(a.variant)}">${a.label}</Button>`).join('') : `<Button className="w-full"><ShoppingCart size={16} className="mr-2" />Add to cart</Button>`}
+        ${actions.length ? actions.map((a) => `<Button variant="${btnVariant(a.variant)}" aria-label="${a.label}">${a.label}</Button>`).join('') : `<Button className="w-full"><ShoppingCart size={16} className="mr-2" />Add to cart</Button>`}
       </CardFooter>
     </Card>`
   }
@@ -347,7 +347,7 @@ export function generateTailwindCard(config: CardConfig): GeneratorOutput {
   if (cardType === 'basic') {
     body = `
     <div className="${base} max-w-sm">
-      ${showImage ? `<img src="/placeholder.jpg" alt="${title}" className="h-48 w-full object-cover" />` : ''}
+      ${showImage ? `<img src="/placeholder.jpg" alt="${title} product image" className="h-48 w-full object-cover" />` : ''}
       <div className="p-5">
         <div className="flex items-start justify-between">
           <div><h3 className="text-sm font-semibold text-gray-900">${title}</h3><p className="text-xs text-gray-500">${subtitle}</p></div>
@@ -399,7 +399,7 @@ export function generateTailwindCard(config: CardConfig): GeneratorOutput {
     body = `
     <div className="${base} max-w-xs overflow-hidden">
       <div className="relative">
-        <img src="/placeholder.jpg" alt="${title}" className="h-48 w-full object-cover" />
+        <img src="/placeholder.jpg" alt="${title} product image" className="h-48 w-full object-cover" />
         ${showBadge ? `<span className="absolute left-3 top-3 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-medium text-white">${badgeText}</span>` : ''}
       </div>
       <div className="p-4">

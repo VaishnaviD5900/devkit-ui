@@ -427,18 +427,22 @@ export function ${componentName}Modal({ children, trigger }: ${componentName}Mod
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            aria-hidden="true"
             ${closeOnBackdrop ? 'onClick={handleClose}' : ''}
           />
 
           {/* Modal */}
           <div
             className="relative z-10 w-full ${sizeClass} rounded-lg border border-gray-200 bg-white shadow-xl"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-              <h2 className="text-base font-semibold text-gray-900">${title}</h2>
-              ${showCloseButton ? `<button onClick={handleClose} className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+              <h2 id="modal-title" className="text-base font-semibold text-gray-900">${title}</h2>
+              ${showCloseButton ? `<button onClick={handleClose} aria-label="Close modal" className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>` : ''}
             </div>

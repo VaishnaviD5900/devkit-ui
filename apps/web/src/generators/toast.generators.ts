@@ -336,7 +336,7 @@ export function ToastContainer() {
   if (!toasts.length) return null
 
   return (
-    <div className="fixed ${posClass} z-50 flex flex-col gap-2">
+    <div className="fixed ${posClass} z-50 flex flex-col gap-2" aria-live="polite" aria-atomic="false" aria-label="Notifications">
       {toasts.map((toast) => (
         <ToastItem
           key={toast.id}
@@ -357,9 +357,9 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
   }, [])` : ''}
 
   return (
-    <div className="w-72 overflow-hidden rounded-lg border shadow-lg ${s.container}">
+    <div className="w-72 overflow-hidden rounded-lg border shadow-lg ${s.container}" role="status" aria-live="polite">
       <div className="flex items-start gap-3 px-4 py-3">
-        ${showIcon ? `<span className="mt-0.5 flex-shrink-0 ${s.icon}">
+        ${showIcon ? `<span className="mt-0.5 flex-shrink-0 ${s.icon}" aria-hidden="true">
           ${iconSvg[variant]}
         </span>` : ''}
         <div className="flex-1 min-w-0">
@@ -372,7 +372,7 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
             ${actionLabel}
           </button>` : ''}
         </div>
-        ${showCloseButton ? `<button onClick={onDismiss} className="flex-shrink-0 rounded p-0.5 opacity-60 hover:opacity-100">
+        ${showCloseButton ? `<button onClick={onDismiss} aria-label="Dismiss notification" className="flex-shrink-0 rounded p-0.5 opacity-60 hover:opacity-100">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>` : ''}
       </div>
