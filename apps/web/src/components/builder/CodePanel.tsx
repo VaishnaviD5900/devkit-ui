@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { useBuilderStore } from '@/stores/builder.store'
-import { generateForm, generateTable, generateCard, generateNavbar, generateModal, generateAlert, generateToast } from '@/generators'
+import { generateForm, generateTable, generateCard, generateNavbar, generateModal, generateAlert, generateToast, generateTabs } from '@/generators'
 
 const CODE_TABS = [
   { id: 'component', label: 'Component' },
@@ -10,18 +10,21 @@ const CODE_TABS = [
 ]
 
 export function CodePanel() {
-  const { framework, componentType, formTitle, fields, showSubmitButton, showLabels, showValidation, tableConfig, cardConfig, navbarConfig, modalConfig, alertConfig, toastConfig } = useBuilderStore()
+  const s = useBuilderStore()
   const [activeTab, setActiveTab] = useState('component')
   const [copied, setCopied] = useState(false)
 
   const output =
-    componentType === 'table' ? generateTable(framework, tableConfig)
-    : componentType === 'card' ? generateCard(framework, cardConfig)
-    : componentType === 'navbar' ? generateNavbar(framework, navbarConfig)
-    : componentType === 'modal' ? generateModal(framework, modalConfig)
-    : componentType === 'alert' ? generateAlert(framework, alertConfig)
-    : componentType === 'toast' ? generateToast(framework, toastConfig)
-    : generateForm(framework, { title: formTitle, fields, showSubmitButton, showLabels, showValidation })
+    s.componentType === 'table' ? generateTable(s.framework, s.tableConfig)
+    : s.componentType === 'card' ? generateCard(s.framework, s.cardConfig)
+    : s.componentType === 'navbar' ? generateNavbar(s.framework, s.navbarConfig)
+    : s.componentType === 'modal' ? generateModal(s.framework, s.modalConfig)
+    : s.componentType === 'alert' ? generateAlert(s.framework, s.alertConfig)
+    : s.componentType === 'toast' ? generateToast(s.framework, s.toastConfig)
+    : s.componentType === 'tabs' ? generateTabs(s.framework, s.tabsConfig)
+    : ['badge', 'accordion', 'tooltip', 'breadcrumb'].includes(s.componentType)
+      ? { code: `// ${s.componentType} generator coming soon`, language: 'tsx' as const, imports: [] }
+      : generateForm(s.framework, { title: s.formTitle, fields: s.fields, showSubmitButton: s.showSubmitButton, showLabels: s.showLabels, showValidation: s.showValidation })
 
   const displayCode = activeTab === 'imports' && output.imports?.length ? output.imports.join('\n') : output.code
 

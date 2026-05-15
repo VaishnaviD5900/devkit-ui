@@ -8,6 +8,7 @@ import { NavbarConfigPanel } from '@/components/builder/NavbarConfigPanel'
 import { ModalConfigPanel } from '@/components/builder/ModalConfigPanel'
 import { AlertConfigPanel } from '@/components/builder/AlertConfigPanel'
 import { ToastConfigPanel } from '@/components/builder/ToastConfigPanel'
+import { TabsConfigPanel } from '@/components/builder/TabsConfigPanel'
 import { PreviewPanel } from '@/components/builder/PreviewPanel'
 import { TablePreview } from '@/components/builder/TablePreview'
 import { CardPreview } from '@/components/builder/CardPreview'
@@ -15,6 +16,7 @@ import { NavbarPreview } from '@/components/builder/NavbarPreview'
 import { ModalPreview } from '@/components/builder/ModalPreview'
 import { AlertPreview } from '@/components/builder/AlertPreview'
 import { ToastPreview } from '@/components/builder/ToastPreview'
+import { TabsPreview } from '@/components/builder/TabsPreview'
 import { PlaceholderPanel, PlaceholderPreview } from '@/components/builder/PlaceholderPanel'
 import { CodePanel } from '@/components/builder/CodePanel'
 import { useBuilderStore } from '@/stores/builder.store'
@@ -31,7 +33,7 @@ const CONFIG_PANELS = {
   modal: ModalConfigPanel,
   alert: AlertConfigPanel,
   toast: ToastConfigPanel,
-  tabs: PlaceholderPanel,
+  tabs: TabsConfigPanel,
   badge: PlaceholderPanel,
   accordion: PlaceholderPanel,
   tooltip: PlaceholderPanel,
@@ -46,7 +48,7 @@ const PREVIEW_PANELS = {
   modal: ModalPreview,
   alert: AlertPreview,
   toast: ToastPreview,
-  tabs: PlaceholderPreview,
+  tabs: TabsPreview,
   badge: PlaceholderPreview,
   accordion: PlaceholderPreview,
   tooltip: PlaceholderPreview,

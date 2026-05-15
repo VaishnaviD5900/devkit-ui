@@ -153,6 +153,24 @@ export interface ModalConfig {
   showIcon: boolean
 }
 
+// --- Tabs ---
+export type TabsVariant = 'default' | 'pills' | 'underline' | 'boxed'
+export type TabsOrientation = 'horizontal' | 'vertical'
+
+export interface TabItem {
+  id: string
+  label: string
+  content: string
+  icon?: string
+  disabled?: boolean
+}
+
+export interface TabsConfig {
+  variant: TabsVariant
+  orientation: TabsOrientation
+  items: TabItem[]
+  showIcons: boolean
+}
 // --- Store ---
 export interface BuilderState {
   framework: Framework
@@ -211,6 +229,13 @@ export interface BuilderState {
   // Toast
   toastConfig: ToastConfig
   setToastConfig: (updates: Partial<ToastConfig>) => void
+
+  // Tabs
+  tabsConfig: TabsConfig
+  setTabsConfig: (updates: Partial<TabsConfig>) => void
+  addTab: (item: Omit<TabItem, 'id'>) => void
+  removeTab: (id: string) => void
+  updateTab: (id: string, updates: Partial<TabItem>) => void
 }
 
 export const useBuilderStore = create<BuilderState>()(
@@ -369,6 +394,23 @@ export const useBuilderStore = create<BuilderState>()(
         showCloseButton: true,
       },
       setToastConfig: (updates) => set((s) => ({ toastConfig: { ...s.toastConfig, ...updates } })),
+
+      // Tabs
+      tabsConfig: {
+        variant: 'default',
+        orientation: 'horizontal',
+        showIcons: false,
+        items: [
+          { id: '1', label: 'Overview', content: 'Overview content goes here. Add any text, components or data.', icon: 'home' },
+          { id: '2', label: 'Analytics', content: 'Analytics content goes here. Charts, metrics and statistics.', icon: 'chart' },
+          { id: '3', label: 'Settings', content: 'Settings content goes here. Configuration options and preferences.', icon: 'settings', disabled: false },
+          { id: '4', label: 'Disabled', content: '', icon: 'lock', disabled: true },
+        ],
+      },
+      setTabsConfig: (updates) => set((s) => ({ tabsConfig: { ...s.tabsConfig, ...updates } })),
+      addTab: (item) => set((s) => ({ tabsConfig: { ...s.tabsConfig, items: [...s.tabsConfig.items, { ...item, id: crypto.randomUUID() }] } })),
+      removeTab: (id) => set((s) => ({ tabsConfig: { ...s.tabsConfig, items: s.tabsConfig.items.filter((t) => t.id !== id) } })),
+      updateTab: (id, updates) => set((s) => ({ tabsConfig: { ...s.tabsConfig, items: s.tabsConfig.items.map((t) => t.id === id ? { ...t, ...updates } : t) } })),
     }),
     { name: 'builder-store' }
   )
